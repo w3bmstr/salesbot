@@ -1,52 +1,84 @@
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@400;600;700&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-#cb{font-family:'Exo 2',sans-serif;background:#080c17;border:1px solid rgba(0,255,231,0.25);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;height:600px}
-.hdr{background:linear-gradient(135deg,#0d1b2a,#112244);padding:15px 20px;display:flex;align-items:center;gap:13px;border-bottom:1px solid rgba(0,255,231,0.25);flex-shrink:0}
-.av{width:44px;height:44px;min-width:44px;background:rgba(0,255,231,0.1);border:1px solid #00ffe7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
-.ht .t1{color:#00ffe7;font-size:13px;font-weight:700;letter-spacing:2.5px;font-family:'Share Tech Mono',monospace}
-.ht .t2{color:rgba(0,255,231,0.45);font-size:10px;letter-spacing:1.2px;margin-top:3px;font-family:'Share Tech Mono',monospace}
-.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00ffe7;margin-right:5px;animation:blink 1.6s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
-#msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
-#msgs::-webkit-scrollbar{width:3px}
-#msgs::-webkit-scrollbar-thumb{background:rgba(0,255,231,0.2);border-radius:2px}
-.msg{display:flex;gap:9px;animation:fu .28s ease}
-@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.msg.u{flex-direction:row-reverse}
-.mi{width:30px;height:30px;min-width:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px}
-.msg.b .mi{background:rgba(0,255,231,0.1);border:1px solid #00ffe7}
-.msg.u .mi{background:rgba(160,200,255,0.08);border:1px solid rgba(160,200,255,0.25)}
-.bbl{max-width:80%;padding:11px 14px;font-size:13px;line-height:1.75;color:#c8e6ff}
-.msg.b .bbl{background:#112244;border-left:3px solid #00ffe7;border-radius:4px 13px 13px 13px}
-.msg.u .bbl{background:rgba(0,255,231,0.06);border:1px solid rgba(0,255,231,0.18);border-radius:13px 4px 13px 13px;text-align:right}
-.chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 6px}
-.chip{background:transparent;border:1px solid rgba(0,255,231,0.22);color:#00ffe7;padding:5px 11px;border-radius:20px;font-size:11px;font-family:'Share Tech Mono',monospace;cursor:pointer;transition:all .18s}
-.chip:hover{background:rgba(0,255,231,0.1);border-color:#00ffe7}
-.inp-row{padding:12px 16px;border-top:1px solid rgba(0,255,231,0.18);background:#0a0f1e;display:flex;gap:10px;flex-shrink:0;align-items:center}
-#tin{flex:1;background:#0f1e35;border:1px solid rgba(0,255,231,0.22);border-radius:8px;padding:9px 13px;color:#c8e6ff;font-size:13px;font-family:'Exo 2',sans-serif;outline:none}
-#tin::placeholder{color:rgba(200,230,255,0.3)}
-#tin:focus{border-color:rgba(0,255,231,0.5)}
-#sbtn{background:rgba(0,255,231,0.1);border:1px solid #00ffe7;color:#00ffe7;border-radius:8px;padding:9px 15px;font-size:13px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:1px;transition:all .18s}
-#sbtn:hover{background:rgba(0,255,231,0.2)}
-strong{color:#00ffe7;font-weight:600}
-.tag{display:inline-block;font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;color:rgba(0,255,231,0.5);margin-bottom:4px}
-</style>
-<div id="cb">
-<div class="hdr">
-  <div class="av">🤖</div>
-  <div class="ht">
-    <div class="t1">ROBOT SALES ASSISTANT</div>
-    <div class="t2"><span class="dot"></span>ONLINE — DANIEL WILDS WEB DESIGN · BRITISH COLUMBIA, CANADA</div>
-  </div>
-</div>
-<div id="msgs"></div>
-<div class="inp-row">
-  <input id="tin" placeholder="Ask me anything about Daniel's services..." />
-  <button id="sbtn" onclick="send()">SEND ▸</button>
-</div>
-</div>
-<script>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Robot Sales Assistant</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@400;600;700&display=swap');
+
+      *{box-sizing:border-box;margin:0;padding:0}
+      html{height:100%}
+      body{min-height:100%;padding:16px}
+
+      #cb{font-family:'Exo 2',sans-serif;background:#080c17;border:1px solid rgba(0,255,231,0.25);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;height:600px;width:100%;max-width:760px;margin:0 auto;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px)}
+      .hdr{background:linear-gradient(135deg,#0d1b2a,#112244);padding:15px 20px;display:flex;align-items:center;gap:13px;border-bottom:1px solid rgba(0,255,231,0.25);flex-shrink:0}
+      .av{width:44px;height:44px;min-width:44px;background:rgba(0,255,231,0.1);border:1px solid #00ffe7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+      .ht{min-width:0}
+      .ht .t1{color:#00ffe7;font-size:13px;font-weight:700;letter-spacing:2.5px;font-family:'Share Tech Mono',monospace;word-break:break-word}
+      .ht .t2{color:rgba(0,255,231,0.45);font-size:10px;letter-spacing:1.2px;margin-top:3px;font-family:'Share Tech Mono',monospace}
+      .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00ffe7;margin-right:5px;animation:blink 1.6s infinite}
+      @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+
+      #msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+      #msgs::-webkit-scrollbar{width:3px}
+      #msgs::-webkit-scrollbar-thumb{background:rgba(0,255,231,0.2);border-radius:2px}
+
+      .msg{display:flex;gap:9px;animation:fu .28s ease}
+      @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+      .msg.u{flex-direction:row-reverse}
+      .mi{width:30px;height:30px;min-width:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px}
+      .msg.b .mi{background:rgba(0,255,231,0.1);border:1px solid #00ffe7}
+      .msg.u .mi{background:rgba(160,200,255,0.08);border:1px solid rgba(160,200,255,0.25)}
+
+      .bbl{max-width:80%;padding:11px 14px;font-size:13px;line-height:1.75;color:#c8e6ff;min-width:0;overflow-wrap:anywhere}
+      .msg.b .bbl{background:#112244;border-left:3px solid #00ffe7;border-radius:4px 13px 13px 13px}
+      .msg.u .bbl{background:rgba(0,255,231,0.06);border:1px solid rgba(0,255,231,0.18);border-radius:13px 4px 13px 13px;text-align:right}
+
+      .chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 6px}
+      .chip{background:transparent;border:1px solid rgba(0,255,231,0.22);color:#00ffe7;padding:5px 11px;border-radius:20px;font-size:11px;font-family:'Share Tech Mono',monospace;cursor:pointer;transition:all .18s}
+      .chip:hover{background:rgba(0,255,231,0.1);border-color:#00ffe7}
+
+      .inp-row{padding:12px 16px;border-top:1px solid rgba(0,255,231,0.18);background:#0a0f1e;display:flex;gap:10px;flex-shrink:0;align-items:center}
+      #tin{flex:1;min-width:0;background:#0f1e35;border:1px solid rgba(0,255,231,0.22);border-radius:8px;padding:9px 13px;color:#c8e6ff;font-size:13px;font-family:'Exo 2',sans-serif;outline:none}
+      #tin::placeholder{color:rgba(200,230,255,0.3)}
+      #tin:focus{border-color:rgba(0,255,231,0.5)}
+      #sbtn{background:rgba(0,255,231,0.1);border:1px solid #00ffe7;color:#00ffe7;border-radius:8px;padding:9px 15px;font-size:13px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:1px;transition:all .18s;white-space:nowrap}
+      #sbtn:hover{background:rgba(0,255,231,0.2)}
+
+      strong{color:#00ffe7;font-weight:600}
+      .tag{display:inline-block;font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;color:rgba(0,255,231,0.5);margin-bottom:4px}
+
+      @media (max-width: 520px){
+        body{padding:10px}
+        #cb{height:calc(100dvh - 20px);max-height:none}
+        .hdr{padding:12px 14px;gap:10px}
+        .av{width:38px;height:38px;min-width:38px;font-size:19px}
+        .ht .t1{font-size:12px;letter-spacing:2px}
+        .ht .t2{font-size:9px;letter-spacing:1px}
+        #msgs{padding:12px;gap:10px}
+        .bbl{max-width:88%;font-size:13px}
+        .inp-row{padding:10px 12px;gap:8px}
+        #sbtn{padding:9px 12px}
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cb">
+      <div class="hdr">
+        <div class="av">🤖</div>
+        <div class="ht">
+          <div class="t1">ROBOT SALES ASSISTANT</div>
+          <div class="t2"><span class="dot"></span>ONLINE — DANIEL WILDS WEB DESIGN · BRITISH COLUMBIA, CANADA</div>
+        </div>
+      </div>
+      <div id="msgs"></div>
+      <div class="inp-row">
+        <input id="tin" placeholder="Ask me anything about Daniel's services..." />
+        <button id="sbtn" onclick="send()">SEND ▸</button>
+      </div>
+    </div>
+    <script>
 const KB=[
   {k:['aurora','corporate','b2b','enterprise','boardroom'],t:'MEET THE TEAM',a:'<strong>Aurora</strong> is the corporate tech representative — precise, data-driven, and professional. She excels in B2B enterprise environments, boardroom presentations, and tech sector sales. Her communication style is clear, confident, and backed by numbers. Aurora wears tailored blazers and structured professional attire that commands authority in any boardroom.'},
   {k:['maya','retail','lifestyle','boutique','fashion','beauty'],t:'MEET THE TEAM',a:'<strong>Maya</strong> is the retail lifestyle specialist — warm, personable, and fashion-forward. She connects with customers on a genuine human level, making her ideal for boutique retail, beauty, fashion, and lifestyle brands. Maya\'s styling follows Canadian smart-casual standards with a contemporary edge that puts shoppers at ease.'},
@@ -194,4 +226,6 @@ document.getElementById('tin').addEventListener('keydown',e=>{if(e.key==='Enter'
 
 addMsg('👋 Hello! I\'m the Robot Sales Assistant for <strong>Daniel Wilds Web Design</strong>. Ask me anything, or tap a topic below to get started. You can also reach Daniel directly at <strong>danieldavidwilds@gmail.com</strong> or <strong>(604) 901-1692</strong>.',false,null);
 addChips();
-</script>
+    </script>
+  </body>
+</html>
