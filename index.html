@@ -1,0 +1,197 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@400;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+#cb{font-family:'Exo 2',sans-serif;background:#080c17;border:1px solid rgba(0,255,231,0.25);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;height:600px}
+.hdr{background:linear-gradient(135deg,#0d1b2a,#112244);padding:15px 20px;display:flex;align-items:center;gap:13px;border-bottom:1px solid rgba(0,255,231,0.25);flex-shrink:0}
+.av{width:44px;height:44px;min-width:44px;background:rgba(0,255,231,0.1);border:1px solid #00ffe7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+.ht .t1{color:#00ffe7;font-size:13px;font-weight:700;letter-spacing:2.5px;font-family:'Share Tech Mono',monospace}
+.ht .t2{color:rgba(0,255,231,0.45);font-size:10px;letter-spacing:1.2px;margin-top:3px;font-family:'Share Tech Mono',monospace}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00ffe7;margin-right:5px;animation:blink 1.6s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+#msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+#msgs::-webkit-scrollbar{width:3px}
+#msgs::-webkit-scrollbar-thumb{background:rgba(0,255,231,0.2);border-radius:2px}
+.msg{display:flex;gap:9px;animation:fu .28s ease}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.u{flex-direction:row-reverse}
+.mi{width:30px;height:30px;min-width:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px}
+.msg.b .mi{background:rgba(0,255,231,0.1);border:1px solid #00ffe7}
+.msg.u .mi{background:rgba(160,200,255,0.08);border:1px solid rgba(160,200,255,0.25)}
+.bbl{max-width:80%;padding:11px 14px;font-size:13px;line-height:1.75;color:#c8e6ff}
+.msg.b .bbl{background:#112244;border-left:3px solid #00ffe7;border-radius:4px 13px 13px 13px}
+.msg.u .bbl{background:rgba(0,255,231,0.06);border:1px solid rgba(0,255,231,0.18);border-radius:13px 4px 13px 13px;text-align:right}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 6px}
+.chip{background:transparent;border:1px solid rgba(0,255,231,0.22);color:#00ffe7;padding:5px 11px;border-radius:20px;font-size:11px;font-family:'Share Tech Mono',monospace;cursor:pointer;transition:all .18s}
+.chip:hover{background:rgba(0,255,231,0.1);border-color:#00ffe7}
+.inp-row{padding:12px 16px;border-top:1px solid rgba(0,255,231,0.18);background:#0a0f1e;display:flex;gap:10px;flex-shrink:0;align-items:center}
+#tin{flex:1;background:#0f1e35;border:1px solid rgba(0,255,231,0.22);border-radius:8px;padding:9px 13px;color:#c8e6ff;font-size:13px;font-family:'Exo 2',sans-serif;outline:none}
+#tin::placeholder{color:rgba(200,230,255,0.3)}
+#tin:focus{border-color:rgba(0,255,231,0.5)}
+#sbtn{background:rgba(0,255,231,0.1);border:1px solid #00ffe7;color:#00ffe7;border-radius:8px;padding:9px 15px;font-size:13px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:1px;transition:all .18s}
+#sbtn:hover{background:rgba(0,255,231,0.2)}
+strong{color:#00ffe7;font-weight:600}
+.tag{display:inline-block;font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;color:rgba(0,255,231,0.5);margin-bottom:4px}
+</style>
+<div id="cb">
+<div class="hdr">
+  <div class="av">🤖</div>
+  <div class="ht">
+    <div class="t1">ROBOT SALES ASSISTANT</div>
+    <div class="t2"><span class="dot"></span>ONLINE — DANIEL WILDS WEB DESIGN · BRITISH COLUMBIA, CANADA</div>
+  </div>
+</div>
+<div id="msgs"></div>
+<div class="inp-row">
+  <input id="tin" placeholder="Ask me anything about Daniel's services..." />
+  <button id="sbtn" onclick="send()">SEND ▸</button>
+</div>
+</div>
+<script>
+const KB=[
+  {k:['aurora','corporate','b2b','enterprise','boardroom'],t:'MEET THE TEAM',a:'<strong>Aurora</strong> is the corporate tech representative — precise, data-driven, and professional. She excels in B2B enterprise environments, boardroom presentations, and tech sector sales. Her communication style is clear, confident, and backed by numbers. Aurora wears tailored blazers and structured professional attire that commands authority in any boardroom.'},
+  {k:['maya','retail','lifestyle','boutique','fashion','beauty'],t:'MEET THE TEAM',a:'<strong>Maya</strong> is the retail lifestyle specialist — warm, personable, and fashion-forward. She connects with customers on a genuine human level, making her ideal for boutique retail, beauty, fashion, and lifestyle brands. Maya\'s styling follows Canadian smart-casual standards with a contemporary edge that puts shoppers at ease.'},
+  {k:['riley','field','outdoor','trade show','on-site','onsite'],t:'MEET THE TEAM',a:'<strong>Riley</strong> is the field consultant — energetic, adaptable, and practical. She thrives in on-site, outdoor, and trade show environments where versatility matters most. Riley\'s attire is smart-casual and weather-appropriate, reflecting Canadian practicality while maintaining a professional image in any setting.'},
+  {k:['robot','saleswomen','team','personas','three'],t:'MEET THE TEAM',a:'Daniel\'s team features three robot sales personas — each built for a different environment. <strong>Aurora</strong> handles corporate and B2B. <strong>Maya</strong> covers retail and lifestyle. <strong>Riley</strong> works in field and on-site settings. Together they represent a full-spectrum sales force designed to match any business context.'},
+  {k:['outfit','wear','dress','wardrobe','clothes','attire'],t:'MEET THE TEAM',a:'All three follow Canadian professional standards. <strong>Aurora</strong> wears structured blazers and tailored dresses for corporate environments. <strong>Maya</strong> wears contemporary smart-casual and lifestyle-branded outfits suited to retail floors. <strong>Riley</strong> wears practical, weather-ready professional wear for field settings.'},
+  {k:['what can','do they do','capable','ability','function'],t:'MEET THE TEAM',a:'The robot saleswomen can greet customers, answer product and pricing questions, handle objections, guide buyers through decisions, and close sales — all without fatigue or inconsistency. They operate on a defined script that matches your brand voice, and can be updated at any time as your business evolves.'},
+  {k:['get one','buy','purchase','order','acquire'],t:'MEET THE TEAM',a:'Contact Daniel directly to discuss which model fits your business, your environment, and your budget. Pricing varies based on customization, deployment setting, and any ongoing scripting or wardrobe updates. Reach out at <strong>danieldavidwilds@gmail.com</strong> or call <strong>(604) 901-1692</strong>.'},
+  {k:['type','kind','build','what site','what websites'],t:'GENERAL WEB DESIGN',a:'Daniel builds both <strong>custom HTML websites</strong> and <strong>WordPress websites</strong>. HTML sites are lightweight, fast-loading, and low-maintenance — ideal for portfolios, landing pages, and small business sites. WordPress is flexible, scalable, and easy for you to manage — ideal for blogs, service businesses, and eCommerce.'},
+  {k:['how long','timeline','time','weeks','duration'],t:'GENERAL WEB DESIGN',a:'Most projects take <strong>1–4 weeks</strong> depending on size, features, and how quickly you provide content and feedback. Simple brochure sites can be completed in under two weeks. Larger projects with eCommerce or custom features may take longer. You will always receive a clear timeline upfront.'},
+  {k:['cost','price','pricing','how much','rate','fee','charge'],t:'PRICING & PACKAGES',a:'Starter sites begin around <strong>$799</strong>. Business sites with more pages and features are priced higher. eCommerce stores vary based on the number of products and integrations required. Custom builds are quoted individually. Every quote is transparent — no hidden fees or surprise charges. Contact Daniel for a free estimate.'},
+  {k:['mobile','responsive','phone','tablet','device'],t:'GENERAL WEB DESIGN',a:'Yes. Every website Daniel builds is fully <strong>responsive</strong> and tested across phones, tablets, and desktops. Mobile optimization is not an add-on — it is a standard part of every project. Over half of all web traffic comes from mobile devices, so this is non-negotiable.'},
+  {k:['redesign','existing','modernize','update','refresh'],t:'GENERAL WEB DESIGN',a:'Yes. Daniel can modernize your design, improve load speeds, update your content, fix broken elements, and optimize for SEO and conversions. Redesigns are available for both HTML and WordPress sites. He can work from your existing content or help refresh it entirely.'},
+  {k:['ecommerce','e-commerce','shop','store','woocommerce','shopify','product'],t:'GENERAL WEB DESIGN',a:'Yes. Daniel builds online stores using <strong>WooCommerce</strong> (WordPress) and <strong>Shopify</strong>. This includes product setup, category organization, payment gateway integration, shipping configuration, and training so you can manage your store with confidence.'},
+  {k:['update myself','manage','self','own','cms','edit'],t:'GENERAL WEB DESIGN',a:'For <strong>WordPress sites</strong>, yes — Daniel provides hands-on training so you can manage pages, posts, images, and products on your own. For HTML sites, updates require code changes, which Daniel can handle through a maintenance plan or on a one-off basis.'},
+  {k:['outside','international','remote','abroad','other province','canada'],t:'GENERAL WEB DESIGN',a:'Yes. Daniel works remotely and serves clients <strong>across Canada and internationally</strong>. All communication, file sharing, and project management can be handled online via email, video calls, or messaging — whatever works best for you.'},
+  {k:['squarespace','wix','template','builder','different','vs'],t:'GENERAL WEB DESIGN',a:'Template builders are fast and inexpensive, but every site looks similar and you\'re limited by their constraints. Daniel builds sites <strong>custom-tailored</strong> to your brand and goals — with better performance, real SEO setup, and no monthly platform fees locking you in. <strong>You own everything outright.</strong>'},
+  {k:['html','custom html','hand-coded','hand coded','static'],t:'CUSTOM HTML',a:'A custom HTML website is hand-coded from scratch using HTML, CSS, and JavaScript. There are no page builders, no plugins, and no bloated frameworks — just clean, lean code purpose-built for your site. The result is exceptional load speed, strong security, and minimal ongoing maintenance.'},
+  {k:['html over wordpress','html vs wordpress','why html','choose html'],t:'CUSTOM HTML',a:'HTML sites load significantly faster, have no plugin vulnerabilities, and require almost no ongoing maintenance. They are a great fit for portfolios, landing pages, event sites, and any business that doesn\'t need frequent content updates. If your site is mostly static, HTML is the cleaner, faster choice.'},
+  {k:['add feature','add later','grow','expand html','add to html'],t:'CUSTOM HTML',a:'Yes. Contact forms, image galleries, animations, booking widgets, maps, and custom scripts can all be integrated at any time. HTML sites are not rigid — they can grow with your business. Daniel can also migrate an HTML site to WordPress if your needs change.'},
+  {k:['fast','speed','load','pagespeed','performance','score'],t:'CUSTOM HTML',a:'Custom HTML sites typically score in the <strong>90–100 range</strong> on Google PageSpeed Insights when images are optimized. Fast load times improve both user experience and SEO rankings. This is one of the biggest advantages of going custom over a template platform.'},
+  {k:['suited for','best for','who is','ideal','good for','right for'],t:'CUSTOM HTML',a:'HTML sites are ideal for <strong>photographers, tradespeople, local service businesses, freelancers, and event promoters</strong> — anyone who wants a clean professional web presence without the complexity of a CMS. If you don\'t need to post blog content or manage a large product catalogue, HTML is likely the better choice.'},
+  {k:['why wordpress','choose wordpress','wordpress good','wordpress benefit'],t:'WORDPRESS',a:'WordPress powers over <strong>40% of all websites globally</strong> — it\'s flexible, scalable, and easy to manage without technical knowledge. It\'s ideal for service businesses, blogs, eCommerce, and any site where you want to update content regularly without hiring a developer every time.'},
+  {k:['custom theme','wordpress theme','theme'],t:'WORDPRESS',a:'Yes. Daniel can build a theme from scratch or customize an existing theme to match your brand precisely. This includes custom layouts, typography, color schemes, header and footer design, and any special components your business requires.'},
+  {k:['plugin','plugins','configuration','yoast','wordfence'],t:'WORDPRESS',a:'Yes. Daniel selects, installs, and configures the right plugins for your needs — including SEO (Yoast, Rank Math), security (Wordfence), forms (WPForms, Gravity Forms), eCommerce (WooCommerce), caching, analytics, and more. Only trusted, well-maintained plugins are used and the total count is kept lean for performance.'},
+  {k:['secure','security','hack','safe','protection','firewall','ssl'],t:'WORDPRESS',a:'Yes. Daniel applies security hardening as a standard part of every WordPress build — including login protection, firewall setup, SSL configuration, file permissions, and removing default attack surfaces. Ongoing maintenance plans include regular security monitoring and updates.'},
+  {k:['migrate','migration','switch','move to wordpress','from squarespace'],t:'WORDPRESS',a:'Yes. Daniel can migrate your existing website — whether it\'s a static HTML site, another CMS, or a hosted platform like Squarespace or Wix — into WordPress while preserving your content, URLs, and SEO equity where possible.'},
+  {k:['training','teach','learn','wordpress training','how to use'],t:'WORDPRESS',a:'Yes. Every WordPress project includes walkthrough training so you can confidently manage your site. Daniel covers the editor, adding pages and posts, uploading images, updating menus, and basic plugin management. Written documentation is also available on request.'},
+  {k:['seo','search engine','rank','ranking','optimization','google','keyword'],t:'SEO',a:'Yes. Daniel provides <strong>on-page SEO</strong> as a standard part of every build — including keyword research, title tags, meta descriptions, heading structure, image alt text, and internal linking. Standalone SEO packages are also available for sites that need a more comprehensive strategy.'},
+  {k:['will i rank','rank on google','appear on google','show on google'],t:'SEO',a:'A well-built, SEO-optimized site gives you the best possible foundation. Actual rankings depend on your competition, content quality, and ongoing SEO activity. Daniel builds the technical foundation correctly from day one, and offers ongoing SEO packages to keep improving your visibility over time.'},
+  {k:['image seo','image optim','alt text','webp','geotag'],t:'SEO',a:'Yes. Daniel renames image files with descriptive keywords, adds proper alt text, compresses images, and converts to modern formats like <strong>WebP</strong> where applicable. For local businesses, he also geotags photos to improve visibility in local search results.'},
+  {k:['analytics','google analytics','search console','ga4','tracking'],t:'SEO',a:'Yes. Daniel integrates <strong>Google Analytics 4</strong> and <strong>Google Search Console</strong> so you can track visitor behaviour, traffic sources, keyword rankings, and technical issues. These tools are essential for understanding your audience and measuring SEO results.'},
+  {k:['local seo','near me','local search','local','area','city','nap'],t:'SEO',a:'Local SEO helps your business appear in searches like "web designer near me" or "plumber in Kamloops." Daniel optimizes your site and listings for your geographic area — including NAP consistency (name, address, phone), location keywords, Google Business Profile optimization, and local citation building.'},
+  {k:['how long seo','seo time','seo results','seo months'],t:'SEO',a:'SEO is a long-term strategy. Technical improvements can show results in a few weeks, but competitive keyword rankings typically take <strong>3–6 months</strong> of consistent work. Local SEO for less-competitive markets can show results faster. Daniel sets realistic expectations and tracks progress monthly.'},
+  {k:['listing','google business','bing places','apple business','maps'],t:'BUSINESS LISTINGS',a:'Daniel sets up listings on <strong>Google Business Profile</strong>, <strong>Bing Places for Business</strong>, and <strong>Apple Business Connect</strong> — the three most important platforms for local visibility, covering the vast majority of search queries across all devices and operating systems.'},
+  {k:['why listing','listing important','listing benefit','business listing why'],t:'BUSINESS LISTINGS',a:'Verified business listings help customers find you in local searches, provide your hours and contact info in one click, allow customers to leave reviews, and signal to Google that your business is legitimate. They are one of the <strong>highest-ROI visibility investments</strong> any local business can make.'},
+  {k:['listing information','listing content','listing setup','what listing'],t:'BUSINESS LISTINGS',a:'Daniel handles business name, address, phone number, website URL, hours of operation, business categories, description, logo, cover photo, and additional photos. He also assists with the verification process and ensures your information is consistent across all three platforms.'},
+  {k:['ongoing listing','listing management','listing monthly','listing update'],t:'BUSINESS LISTINGS',a:'Yes. Pro and Elite listing packages include monthly updates, review monitoring, performance reports, photo refreshes, and corrections if Google auto-suggests changes to your listing. Keeping listings accurate and active is important for maintaining local search rankings.'},
+  {k:['existing listing','already have','improve listing','optimize listing'],t:'BUSINESS LISTINGS',a:'Absolutely. Many existing listings are incomplete, have outdated information, or are missing photos and categories. Daniel audits your current listing, identifies gaps, and fully optimizes it to perform at its best.'},
+  {k:['package','packages','starter','business pro','elite','what do i get'],t:'PRICING & PACKAGES',a:'Daniel offers <strong>Starter, Business Pro, eCommerce, and Custom</strong> website packages, as well as <strong>Starter, Pro, and Elite</strong> visibility packages covering Google, Bing, and Apple listings. Each package has a defined scope so you know exactly what you\'re getting.'},
+  {k:['customize package','custom package','remove','add extra','adjust'],t:'PRICING & PACKAGES',a:'Yes. Every business has unique needs. Daniel is happy to remove services you don\'t need or add extras like copywriting, logo design, additional pages, or ongoing SEO. Custom packages are quoted individually with full transparency.'},
+  {k:['deposit','upfront','start','begin','first payment'],t:'PRICING & PACKAGES',a:'Yes. A deposit is required to begin work. This secures your spot in the project schedule and covers initial work such as design mockups and research. The remaining balance is due upon project completion before the site goes live.'},
+  {k:['ongoing cost','after launch','hosting','domain','annual','monthly cost'],t:'PRICING & PACKAGES',a:'Yes — domain registration (typically <strong>$15–$20 CAD/year</strong>) and hosting are ongoing costs. WordPress sites may also have costs for premium plugins. Optional maintenance plans are available monthly. Daniel will outline all expected costs before the project begins.'},
+  {k:['payment plan','installment','milestone payment','pay over time'],t:'PRICING & PACKAGES',a:'For larger projects, Daniel is open to discussing a <strong>milestone-based payment structure</strong>. This is something you can discuss during the initial consultation. Contact Daniel to talk through what works best for your budget.'},
+  {k:['maintenance','maintain','maintenance plan','monthly plan','support plan'],t:'MAINTENANCE',a:'Yes. Maintenance plans include plugin and theme updates, security monitoring, performance checks, offsite backups, and small content changes. Having a maintenance plan gives you peace of mind that your site is always running securely and correctly.'},
+  {k:['break','down','broken','crash','not working','fix'],t:'MAINTENANCE',a:'If you are on a maintenance plan, Daniel prioritizes fixing issues promptly. For clients without a plan, he offers one-time support fixes on a per-incident basis. Backups are also kept as part of maintenance plans so recovery is fast when something goes wrong.'},
+  {k:['plugin update','theme update','update plugin','keeping updated'],t:'MAINTENANCE',a:'Yes. Plugin and theme updates are included in all maintenance plans. Updates are tested carefully before being applied to your live site — outdated plugins are one of the most common causes of WordPress security vulnerabilities and site breakages.'},
+  {k:['backup','backups','offsite backup','restore','data'],t:'MAINTENANCE',a:'Yes. Maintenance plans include regular <strong>offsite backups</strong> stored separately from your hosting account. This means if your host ever has an issue, your site data is safe and can be restored quickly.'},
+  {k:['logo','brand','branding','branding kit','palette','identity'],t:'BRANDING',a:'Yes. Daniel designs clean, modern logos and full branding kits including colour palettes, typography, and usage guidelines. A strong logo is the foundation of a professional business identity and ensures your brand looks consistent across your website, listings, and printed materials.'},
+  {k:['copy','copywrite','content','write','text','page content','words'],t:'BRANDING',a:'Yes. Daniel offers copywriting for home pages, about pages, service pages, landing pages, product descriptions, and blog articles. Good copy is essential for both <strong>SEO and conversions</strong> — it tells visitors who you are and why they should choose you.'},
+  {k:['visual','graphic','image','banner','social media','icon'],t:'BRANDING',a:'Yes. Daniel provides image sourcing, optimization, graphic design, icons, banners, and branded social media assets. Consistent visuals across your website and listings strengthen your brand and improve professionalism in the eyes of potential customers.'},
+  {k:['already have logo','existing brand','my logo','own branding','existing logo'],t:'BRANDING',a:'No problem. Daniel will match the website design to your existing brand identity — using your logo, colours, fonts, and tone of voice. Just share your brand assets and guidelines and he\'ll work within them.'},
+  {k:['need from me','what do you need','get started','requirements','provide'],t:'PROCESS',a:'Daniel needs: your goals and vision, preferred style or examples you like, your existing content (text and images), branding materials (logo, colours, fonts), and any specific features you need. The more detail you share upfront, the smoother and faster the project will go.'},
+  {k:['communicate','communication','contact during','updates','how do we'],t:'PROCESS',a:'Email, phone, or scheduled video calls — whatever works best for you. Daniel provides regular updates as milestones are reached and responds to messages promptly. Clear communication is a priority throughout every project.'},
+  {k:['project timeline','timeline','schedule','stages','milestones'],t:'PROCESS',a:'Yes. You\'ll receive a clear timeline outlining each stage: discovery, design, development, review, and launch. Milestones help keep the project on track and give you visibility into progress at every stage.'},
+  {k:['revision','revisions','changes','how many changes','rounds'],t:'PROCESS',a:'Revision rounds are outlined in your project agreement. Most packages include <strong>two or three rounds</strong> of revisions. Daniel aims to get things right the first time by gathering thorough requirements upfront — so revisions tend to be minor adjustments rather than major changes.'},
+  {k:['rush','urgent','fast','deadline','quick','asap'],t:'PROCESS',a:'Rush options are available depending on current workload. A rush fee may apply for projects requiring an accelerated timeline. Contact Daniel to discuss your deadline and he\'ll do his best to accommodate it.'},
+  {k:['own','ownership','who owns','mine','my website'],t:'OWNERSHIP',a:'You own the website, all content, and all deliverables in full once the project is paid in full. There are <strong>no licensing fees, no ongoing payments, and no lock-in of any kind</strong>. It\'s yours.'},
+  {k:['domain','hosting','own domain','own hosting','my domain'],t:'OWNERSHIP',a:'Yes. Your domain and hosting accounts are always registered in your name. Daniel never holds ownership of your domain or hosts your site on accounts you can\'t access. <strong>You are always in control of your own infrastructure.</strong>'},
+  {k:['license','licensing','font license','image license','stock'],t:'OWNERSHIP',a:'Yes. Any licensed stock images, icon sets, or fonts used in your project will be documented clearly. Where possible, Daniel uses free or open-licence assets to keep your ongoing costs minimal.'},
+  {k:['where','location','based','british columbia','bc','canada'],t:'CONTACT',a:'Daniel works remotely from <strong>British Columbia, Canada</strong>, and serves clients across Canada and internationally. Remote work means lower overhead and better value — and he\'s experienced at collaborating with clients in different time zones.'},
+  {k:['hours','business hours','open','when','available','monday','friday'],t:'CONTACT',a:'Monday to Friday, <strong>8:00 AM to 6:00 PM Pacific Time</strong>. Daniel does his best to respond to all inquiries within one business day.'},
+  {k:['contact','reach','email','phone','call','get in touch'],t:'CONTACT',a:'<strong>Email:</strong> danieldavidwilds@gmail.com<br><strong>Phone:</strong> (604) 901-1692<br><br>Email is the fastest way to reach Daniel and allows you to share files, links, and detailed information. He\'s also happy to schedule a call to discuss your project in detail.'},
+  {k:['quote','estimate','free quote','no obligation','how do i get'],t:'CONTACT',a:'Send an email or call with a brief description of your project — what type of site you need, your goals, and any features or services you\'re interested in. Daniel will follow up with a <strong>free, no-obligation quote</strong> tailored to your specific needs.'}
+];
+
+const CHIPS=[
+  {l:'💰 Pricing',q:'How much does a website cost?'},
+  {l:'⚡ HTML vs WordPress',q:'Why choose HTML over WordPress?'},
+  {l:'🤖 Meet the robots',q:'Who are the robot saleswomen?'},
+  {l:'📍 Business listings',q:'Why are business listings important?'},
+  {l:'🔒 Security',q:'Will my WordPress site be secure?'},
+  {l:'📞 Contact Daniel',q:'How can I contact you?'}
+];
+
+const FALLBACK="I don't have a specific answer for that, but Daniel would love to help! Reach out directly at <strong>danieldavidwilds@gmail.com</strong> or call <strong>(604) 901-1692</strong> — he responds within one business day.";
+
+function match(q){
+  q=q.toLowerCase();
+  let best=null,bestScore=0;
+  for(const e of KB){
+    let score=0;
+    for(const k of e.k){if(q.includes(k))score+=k.split(' ').length;}
+    if(score>bestScore){bestScore=score;best=e;}
+  }
+  return bestScore>0?best:null;
+}
+
+function addMsg(text,isUser,tag){
+  const msgs=document.getElementById('msgs');
+  const wrap=document.createElement('div');
+  wrap.className='msg '+(isUser?'u':'b');
+  const ico=document.createElement('div');
+  ico.className='mi';
+  ico.textContent=isUser?'👤':'🤖';
+  const bbl=document.createElement('div');
+  bbl.className='bbl';
+  if(tag&&!isUser){
+    const t=document.createElement('div');
+    t.className='tag';
+    t.textContent='▸ '+tag;
+    bbl.appendChild(t);
+  }
+  const p=document.createElement('p');
+  p.innerHTML=text;
+  bbl.appendChild(p);
+  wrap.appendChild(ico);
+  wrap.appendChild(bbl);
+  msgs.appendChild(wrap);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function addChips(){
+  const msgs=document.getElementById('msgs');
+  const wrap=document.createElement('div');
+  wrap.className='chips';
+  CHIPS.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='chip';
+    btn.textContent=c.l;
+    btn.onclick=()=>{respond(c.q);wrap.remove();};
+    wrap.appendChild(btn);
+  });
+  msgs.appendChild(wrap);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function respond(q){
+  addMsg(q,true);
+  const hit=match(q);
+  setTimeout(()=>{
+    addMsg(hit?hit.a:FALLBACK,false,hit?hit.t:null);
+  },320);
+}
+
+function send(){
+  const tin=document.getElementById('tin');
+  const q=tin.value.trim();
+  if(!q)return;
+  tin.value='';
+  respond(q);
+}
+
+document.getElementById('tin').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
+
+addMsg('👋 Hello! I\'m the Robot Sales Assistant for <strong>Daniel Wilds Web Design</strong>. Ask me anything, or tap a topic below to get started. You can also reach Daniel directly at <strong>danieldavidwilds@gmail.com</strong> or <strong>(604) 901-1692</strong>.',false,null);
+addChips();
+</script>
