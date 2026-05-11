@@ -79,7 +79,112 @@
       </div>
     </div>
     <script>
-const KB=[
+    const STATE={lastHit:null};
+
+    const STOPWORDS=new Set([
+      'a','an','and','are','as','at','be','but','by','can','could','did','do','does','for','from','had','has','have','how',
+      'i','if','in','is','it','me','my','of','on','or','our','please','so','that','the','their','them','then','they','this',
+      'to','was','we','what','when','where','who','why','will','with','would','you','your'
+    ]);
+
+    const SYNONYMS=new Map([
+      ['web','website'],['site','website'],['websites','website'],['webpage','website'],['pages','page'],
+      ['costs','cost'],['prices','price'],['pricing','price'],['fees','fee'],['quote','estimate'],['quotes','estimate'],
+      ['call','phone'],['email','contact'],['reach','contact'],['hire','book'],['booking','book'],
+      ['woocommerce','ecommerce'],['shopify','ecommerce'],['store','ecommerce'],['shop','ecommerce'],['commerce','ecommerce'],['ecom','ecommerce'],
+      ['seo','seo'],['ranking','seo'],['google','seo'],
+      ['speed','performance'],['fast','performance'],['pagespeed','performance'],
+      ['secure','security'],['safety','security'],['hack','security'],
+      ['update','maintenance'],['updates','maintenance'],['support','maintenance']
+    ]);
+
+    const FOLLOWUP_HINTS=new Set(['more','details','tell','explain','that','this','it','them','those','he','she','they','what','how']);
+    const CONTEXT_BREAKERS=new Set([
+      'wordpress','html','ecommerce','woocommerce','shopify','seo','listing','security','maintenance','hosting','domain','contact',
+      'robot','robots','aurora','maya','riley'
+    ]);
+    const AMBIGUOUS_CONTEXT_TOKENS=new Set([
+      'much','cost','price','pricing','timeline','time','long','duration','week','weeks','day','days','more','detail','details',
+      'help','contact','email','phone','where','location','hour','hours'
+    ]);
+
+    function norm(str){
+      return String(str)
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g,' ')
+        .trim();
+    }
+
+    function stem(token){
+      let t=token;
+      if(t.length>4 && t.endsWith('ing')) t=t.slice(0,-3);
+      if(t.length>3 && t.endsWith('ed')) t=t.slice(0,-2);
+      if(t.length>3 && t.endsWith('s')) t=t.slice(0,-1);
+      return t;
+    }
+
+    function tokenize(str){
+      const n=norm(str);
+      if(!n) return [];
+      return n
+        .split(/\s+/)
+        .filter(Boolean)
+        .map(stem)
+        .map(t=>{
+          // common typo normalization
+          if(t.startsWith('woocom')) return 'woocommerce';
+          return SYNONYMS.get(t) ?? t;
+        })
+        .filter(t=>t.length>1 && !STOPWORDS.has(t));
+    }
+
+    function levenshtein(a,b){
+      if(a===b) return 0;
+      const al=a.length, bl=b.length;
+      if(al===0) return bl;
+      if(bl===0) return al;
+      const v0=new Array(bl+1);
+      const v1=new Array(bl+1);
+      for(let i=0;i<=bl;i++) v0[i]=i;
+      for(let i=0;i<al;i++){
+        v1[0]=i+1;
+        for(let j=0;j<bl;j++){
+          const cost=a[i]===b[j]?0:1;
+          v1[j+1]=Math.min(v1[j]+1, v0[j+1]+1, v0[j]+cost);
+        }
+        for(let j=0;j<=bl;j++) v0[j]=v1[j];
+      }
+      return v1[bl];
+    }
+
+    function fuzzyTokenMatch(qTokens, needle){
+      if(!needle) return false;
+      if(qTokens.includes(needle)) return true;
+      if(needle.length<4) return false;
+      const maxDist=needle.length>=8?2:1;
+      for(const t of qTokens){
+        if(Math.abs(t.length-needle.length)>2) continue;
+        if(levenshtein(t,needle)<=maxDist) return true;
+      }
+      return false;
+    }
+
+    function expandWithContext(tokens){
+      if(!STATE.lastHit) return tokens;
+      const isShort=tokens.length<=2;
+      const shortIsAmbiguous=tokens.length>0 && tokens.every(t=>AMBIGUOUS_CONTEXT_TOKENS.has(t));
+      const hasBreaker=tokens.some(t=>CONTEXT_BREAKERS.has(t));
+      const looksLikeFollowup=tokens.some(t=>FOLLOWUP_HINTS.has(t));
+      if(((isShort && shortIsAmbiguous) || looksLikeFollowup) && !hasBreaker){
+        const extra=STATE.lastHit._topicTokens ?? [];
+        const merged=[...tokens];
+        for(const t of extra){ if(!merged.includes(t)) merged.push(t); }
+        return merged;
+      }
+      return tokens;
+    }
+
+    const KB=[
   {k:['aurora','corporate','b2b','enterprise','boardroom'],t:'MEET THE TEAM',a:'<strong>Aurora</strong> is the corporate tech representative — precise, data-driven, and professional. She excels in B2B enterprise environments, boardroom presentations, and tech sector sales. Her communication style is clear, confident, and backed by numbers. Aurora wears tailored blazers and structured professional attire that commands authority in any boardroom.'},
   {k:['maya','retail','lifestyle','boutique','fashion','beauty'],t:'MEET THE TEAM',a:'<strong>Maya</strong> is the retail lifestyle specialist — warm, personable, and fashion-forward. She connects with customers on a genuine human level, making her ideal for boutique retail, beauty, fashion, and lifestyle brands. Maya\'s styling follows Canadian smart-casual standards with a contemporary edge that puts shoppers at ease.'},
   {k:['riley','field','outdoor','trade show','on-site','onsite'],t:'MEET THE TEAM',a:'<strong>Riley</strong> is the field consultant — energetic, adaptable, and practical. She thrives in on-site, outdoor, and trade show environments where versatility matters most. Riley\'s attire is smart-casual and weather-appropriate, reflecting Canadian practicality while maintaining a professional image in any setting.'},
@@ -89,7 +194,41 @@ const KB=[
   {k:['get one','buy','purchase','order','acquire'],t:'MEET THE TEAM',a:'Contact Daniel directly to discuss which model fits your business, your environment, and your budget. Pricing varies based on customization, deployment setting, and any ongoing scripting or wardrobe updates. Reach out at <strong>danieldavidwilds@gmail.com</strong> or call <strong>(604) 901-1692</strong>.'},
   {k:['type','kind','build','what site','what websites'],t:'GENERAL WEB DESIGN',a:'Daniel builds both <strong>custom HTML websites</strong> and <strong>WordPress websites</strong>. HTML sites are lightweight, fast-loading, and low-maintenance — ideal for portfolios, landing pages, and small business sites. WordPress is flexible, scalable, and easy for you to manage — ideal for blogs, service businesses, and eCommerce.'},
   {k:['how long','timeline','time','weeks','duration'],t:'GENERAL WEB DESIGN',a:'Most projects take <strong>1–4 weeks</strong> depending on size, features, and how quickly you provide content and feedback. Simple brochure sites can be completed in under two weeks. Larger projects with eCommerce or custom features may take longer. You will always receive a clear timeline upfront.'},
-  {k:['cost','price','pricing','how much','rate','fee','charge'],t:'PRICING & PACKAGES',a:'Starter sites begin around <strong>$799</strong>. Business sites with more pages and features are priced higher. eCommerce stores vary based on the number of products and integrations required. Custom builds are quoted individually. Every quote is transparent — no hidden fees or surprise charges. Contact Daniel for a free estimate.'},
+
+  // Per-item pricing (preferred over grouped tables)
+  {k:['starter site price','starter package price','1–3 pages price','799','website package starter'],t:'PRICE — STARTER SITE',a:'<strong>Starter Site</strong> is <strong>$799 CAD</strong> (1–3 pages, custom design, basic SEO, mobile-friendly).'},
+  {k:['business pro price','business pro package price','1499','up to 7 pages price'],t:'PRICE — BUSINESS PRO',a:'<strong>Business Pro</strong> is <strong>$1,499 CAD</strong> (up to 7 pages, SEO optimization, blog, contact form).'},
+  {k:['e-commerce package price','ecommerce package price','2299','woocommerce store price','payment gateway price','up to 25 products'],t:'PRICE — E-COMMERCE PACKAGE',a:'<strong>E-commerce Package</strong> is <strong>$2,299 CAD</strong> (up to 10 pages, WooCommerce store, payment gateway, up to 25 products).'},
+  {k:['custom solution price','custom website price','3499','starting at 3499','custom package starting'],t:'PRICE — CUSTOM SOLUTION',a:'<strong>Custom Solution</strong> starts at <strong>$3,499 CAD</strong> (unlimited pages + tailored features).'},
+
+  {k:['custom plugin development price','plugin development price','plugin cost','starting at 960','960'],t:'PRICE — CUSTOM PLUGIN DEVELOPMENT',a:'<strong>Custom Plugin Development</strong> starts at <strong>$960 CAD</strong>.'},
+  {k:['custom theme development price','theme development price','theme cost','starting at 980','980'],t:'PRICE — CUSTOM THEME DEVELOPMENT',a:'<strong>Custom Theme Development</strong> starts at <strong>$980 CAD</strong>.'},
+  {k:['speed and security optimization price','speed security optimization price','starting at 420','420','performance security optimization'],t:'PRICE — SPEED & SECURITY OPTIMIZATION',a:'<strong>Speed & Security Optimization</strong> starts at <strong>$420 CAD</strong>.'},
+  {k:['website design and development price','website development price','starting at 2500','2500'],t:'PRICE — WEBSITE DESIGN & DEVELOPMENT',a:'<strong>Website Design & Development</strong> starts at <strong>$2,500 CAD</strong>.'},
+  {k:['e-commerce site design price','ecommerce site development price','starting at 3200','3200','online store development price'],t:'PRICE — E-COMMERCE SITE DESIGN/DEV',a:'<strong>E-commerce Site Design/Development</strong> starts at <strong>$3,200 CAD</strong>.'},
+
+  {k:['logo','logo design price','logo design cost','logo pricing','how much for a logo','200'],t:'PRICE — LOGO DESIGN',a:'<strong>Logo Design</strong> is <strong>$200 CAD</strong>.'},
+  {k:['monthly website maintenance price','monthly maintenance price','maintenance add on price','maintenance addon price','99','99/month'],t:'PRICE — MONTHLY WEBSITE MAINTENANCE',a:'<strong>Monthly Website Maintenance</strong> is <strong>$99/month CAD</strong>.'},
+  {k:['advanced seo audit price','seo audit price','audit and optimization price','350'],t:'PRICE — ADVANCED SEO AUDIT',a:'<strong>Advanced SEO Audit & Optimization</strong> is <strong>$350 CAD</strong>.'},
+  {k:['website copywriting price','copywriting price','copywriting cost','120 per page','120/page','copywriting per page'],t:'PRICE — WEBSITE COPYWRITING',a:'<strong>Website Copywriting</strong> is <strong>$120 CAD per page</strong>.'},
+  {k:['speed optimization price','performance optimization add on price','180'],t:'PRICE — SPEED OPTIMIZATION',a:'<strong>Speed Optimization</strong> is <strong>$180 CAD</strong>.'},
+
+  {k:['wordpress pricing breakdown basic setup','basic wordpress setup price','wordpress setup price','theme installation price','home about contact pages','300–600','300 600'],t:'WORDPRESS BREAKDOWN — BASIC SETUP',a:'<strong>Basic WordPress Setup</strong> is typically <strong>$300–$600 CAD</strong> (theme install, basic pages like Home/About/Contact, SEO setup).'},
+  {k:['wordpress pricing breakdown design','custom design and branding price','branding price','brand price','layout customization price','mobile responsiveness price','600–1200','600 1200'],t:'WORDPRESS BREAKDOWN — DESIGN & BRANDING',a:'<strong>Custom Design & Branding</strong> is typically <strong>$600–$1,200+ CAD</strong> (tailored visuals, layout customization, mobile responsiveness).'},
+  {k:['wordpress pricing breakdown ecommerce','e-commerce integration','ecommerce integration','e-commerce integration price','ecommerce integration price','woocommerce setup price','payment gateways price','product pages price','800–1500','800 1500'],t:'WORDPRESS BREAKDOWN — E-COMMERCE INTEGRATION',a:'<strong>E-commerce Integration</strong> is typically <strong>$800–$1,500+ CAD</strong> (WooCommerce setup, product pages, payment gateways).'},
+  {k:['wordpress pricing breakdown content','content creation price','content writing price','copywriting range','writing original copy','product descriptions price','150–500','150 500'],t:'WORDPRESS BREAKDOWN — CONTENT CREATION',a:'<strong>Content Creation</strong> is typically <strong>$150–$500 CAD</strong> (original copy for pages, blogs, or product descriptions).'},
+  {k:['wordpress pricing breakdown seo','seo optimization','seo optimization price','seo optimization included','included or 200–500','keyword strategy','metadata','image optimization'],t:'WORDPRESS BREAKDOWN — SEO OPTIMIZATION',a:'<strong>SEO Optimization</strong> is usually <strong>included</strong>, or <strong>+$200–$500 CAD</strong> for advanced optimization (keyword strategy, metadata, image optimization).'},
+  {k:['wordpress pricing breakdown maintenance','maintenance and updates','maintenance and updates price','maintenance updates','maintenance updates price','plugin updates price','backups price','75–150/month','75 150 month'],t:'WORDPRESS BREAKDOWN — MAINTENANCE & UPDATES',a:'<strong>Maintenance & Updates</strong> is typically <strong>$75–$150/month CAD</strong> (ongoing support, backups, plugin updates).'},
+
+  {k:['visibility starter package price','starter visibility package price','99 one time setup','99 one-time','starter listing setup price'],t:'PRICE — VISIBILITY STARTER',a:'<strong>Starter Visibility Package</strong> is <strong>$99 CAD</strong> one-time setup.'},
+  {k:['visibility pro package price','pro visibility package price','199 setup','29 per month','29/month'],t:'PRICE — VISIBILITY PRO',a:'<strong>Pro Visibility Package</strong> is <strong>$199 CAD</strong> setup + <strong>$29/month CAD</strong>.'},
+  {k:['visibility elite package price','elite visibility package price','399 setup','59 per month','59/month'],t:'PRICE — VISIBILITY ELITE',a:'<strong>Elite Visibility Package</strong> is <strong>$399 CAD</strong> setup + <strong>$59/month CAD</strong>.'},
+
+  {k:['cost','price','pricing','prices','how much','rate','fee','charge','website cost','website pricing','how much does a website cost','packages','package pricing'],t:'PRICES',a:'<span class="tag">WEB DESIGN PACKAGES (CAD)</span><br><strong>Starter Site</strong> — $799 (1–3 pages, custom design, basic SEO, mobile-friendly)<br><strong>Business Pro</strong> — $1,499 (up to 7 pages, SEO optimization, blog, contact form)<br><strong>E-commerce Package</strong> — $2,299 (up to 10 pages, WooCommerce store, payment gateway, up to 25 products)<br><strong>Custom Solution</strong> — starting at $3,499 (unlimited pages + tailored features)<br><br><span class="tag">NOTE</span><br>These are starting points — every project can be customized. For an exact quote, email <strong>danieldavidwilds@gmail.com</strong>.'},
+  {k:['starting prices','starting at','web services','custom plugin','plugin development','custom theme','theme development','speed and security','optimization service','performance tuning'],t:'WEB SERVICES & STARTING PRICES',a:'<span class="tag">STARTING PRICES (CAD)</span><br><strong>Custom Plugin Development</strong> — starting at $960<br><strong>Custom Theme Development</strong> — starting at $980<br><strong>Speed & Security Optimization</strong> — starting at $420<br><strong>Website Design & Development</strong> — starting at $2,500<br><strong>E-commerce Site Design/Development</strong> — starting at $3,200<br><br>Tell me what you need (WordPress vs custom, pages, features) and I’ll point you to the closest starting point.'},
+  {k:['add ons','add-ons','addons','logo design','maintenance','monthly maintenance','seo audit','advanced seo','copywriting','website copywriting','speed optimization add on'],t:'ADD-ON SERVICES',a:'<span class="tag">ADD-ONS (CAD)</span><br><strong>Logo Design</strong> — $200<br><strong>Monthly Website Maintenance</strong> — $99/month<br><strong>Advanced SEO Audit & Optimization</strong> — $350<br><strong>Website Copywriting</strong> — $120 per page<br><strong>Speed Optimization</strong> — $180'},
+  {k:['wordpress pricing','wordpress breakdown','wordpress website pricing breakdown','basic wordpress setup','custom design and branding','content creation','e-commerce integration','woocommerce setup cost','seo included'],t:'WORDPRESS PRICING BREAKDOWN',a:'<span class="tag">WORDPRESS BREAKDOWN (CAD)</span><br><strong>Basic WordPress Setup</strong> — $300–$600 (theme install, basic pages, SEO setup)<br><strong>Custom Design & Branding</strong> — $600–$1,200+ (tailored visuals, layout, mobile responsiveness)<br><strong>E-commerce Integration</strong> — $800–$1,500+ (WooCommerce, products, payment gateways)<br><strong>Content Creation</strong> — $150–$500 (writing pages/blog/product copy)<br><strong>SEO Optimization</strong> — included or +$200–$500 (advanced keyword strategy, metadata, images)<br><strong>Maintenance & Updates</strong> — $75–$150/month (support, backups, plugin updates)'},
+  {k:['wordpress packages','wp packages','package name price range','starter site 500','starter site 500 800','business pro 1200','business pro 1200 2000','e-commerce 1500','e commerce 1500 3000','e-commerce 1500 3000','wordpress starter package','wordpress business pro package','wordpress e-commerce package'],t:'WORDPRESS PACKAGES',a:'<span class="tag">WORDPRESS PACKAGES (CAD)</span><br><strong>Starter Site</strong> — $500–$800<br>• Basic setup<br>• 3–5 pages<br>• SEO essentials<br><br><strong>Business Pro</strong> — $1,200–$2,000<br>• Custom design<br>• Content support<br>• SEO + image optimization<br>• Contact forms<br><br><strong>E-Commerce</strong> — $1,500–$3,000+<br>• Full store setup<br>• Product uploads<br>• Payment integration<br>• Shipping configuration'},
   {k:['mobile','responsive','phone','tablet','device'],t:'GENERAL WEB DESIGN',a:'Yes. Every website Daniel builds is fully <strong>responsive</strong> and tested across phones, tablets, and desktops. Mobile optimization is not an add-on — it is a standard part of every project. Over half of all web traffic comes from mobile devices, so this is non-negotiable.'},
   {k:['redesign','existing','modernize','update','refresh'],t:'GENERAL WEB DESIGN',a:'Yes. Daniel can modernize your design, improve load speeds, update your content, fix broken elements, and optimize for SEO and conversions. Redesigns are available for both HTML and WordPress sites. He can work from your existing content or help refresh it entirely.'},
   {k:['ecommerce','e-commerce','shop','store','woocommerce','shopify','product'],t:'GENERAL WEB DESIGN',a:'Yes. Daniel builds online stores using <strong>WooCommerce</strong> (WordPress) and <strong>Shopify</strong>. This includes product setup, category organization, payment gateway integration, shipping configuration, and training so you can manage your store with confidence.'},
@@ -114,6 +253,9 @@ const KB=[
   {k:['local seo','near me','local search','local','area','city','nap'],t:'SEO',a:'Local SEO helps your business appear in searches like "web designer near me" or "plumber in Kamloops." Daniel optimizes your site and listings for your geographic area — including NAP consistency (name, address, phone), location keywords, Google Business Profile optimization, and local citation building.'},
   {k:['how long seo','seo time','seo results','seo months'],t:'SEO',a:'SEO is a long-term strategy. Technical improvements can show results in a few weeks, but competitive keyword rankings typically take <strong>3–6 months</strong> of consistent work. Local SEO for less-competitive markets can show results faster. Daniel sets realistic expectations and tracks progress monthly.'},
   {k:['listing','google business','bing places','apple business','maps'],t:'BUSINESS LISTINGS',a:'Daniel sets up listings on <strong>Google Business Profile</strong>, <strong>Bing Places for Business</strong>, and <strong>Apple Business Connect</strong> — the three most important platforms for local visibility, covering the vast majority of search queries across all devices and operating systems.'},
+  {k:['business visibility packages','visibility packages','starter package','starter visibility','starter 99','99 one time','99 one-time','pro package','pro 199','199 setup','29 per month','29/month','elite package','elite 399','399 setup','59 per month','59/month','yelp listing','yellowpages','foursquare','facebook business page','branded email','google search console','search console','google analytics','monthly performance reports','verification assistance','priority support','review monitoring','monthly listing updates'],t:'BUSINESS VISIBILITY PACKAGES',a:'<span class="tag">BUSINESS VISIBILITY PACKAGES</span><br><strong>🌱 Starter Package</strong> — <strong>$99</strong> one-time setup<br>Perfect for new businesses or side hustles.<br>• Google Business Profile setup<br>• Bing Places for Business setup<br>• Apple Business Connect setup<br>• Business info, hours, photos, category<br>• Verification assistance<br><br><strong>🚀 Pro Package</strong> — <strong>$199</strong> setup + <strong>$29/month</strong><br>Everything in Starter, plus:<br>• Yelp listing setup<br>• Facebook Business Page creation<br>• Monthly listing updates (hours, photos, offers)<br>• Basic review monitoring<br>• Priority support<br><br><strong>👑 Elite Package</strong> — <strong>$399</strong> setup + <strong>$59/month</strong><br>Everything in Pro, plus:<br>• Listings on 5+ directories (Yelp, YellowPages, Foursquare, etc.)<br>• SEO optimization for all listings<br>• Branded email setup (e.g., info@yourbusiness.com)<br>• Google Search Console & Analytics setup<br>• Monthly performance reports'},
+  {k:['what do you handle','what do you typically handle','claim listing','verification','nap','hours','categories','photos','logo upload','postcard'],t:'BUSINESS LISTINGS — WHAT’S INCLUDED',a:'<span class="tag">LISTINGS SETUP INCLUDES</span><br>Typically handled:<br>• Profile creation or claiming<br>• Business name, address, phone (NAP)<br>• Hours of operation<br>• Category selection<br>• Photos + logo upload<br>• Verification (postcard/phone/email)<br><br><span class="tag">OPTIONAL ADD-ONS</span><br>• Review monitoring & response<br>• Post updates/offers<br>• Add booking links<br>• Social sync<br>• SEO optimization for listings<br>• Additional directories (Apple Maps/Yelp/etc.)'},
+  {k:['why apple maps','apple maps','siri','spotlight','iphone users','ios audience','default navigation app'],t:'WHY APPLE MAPS MATTERS',a:'Apple Maps matters because it reaches a massive iOS audience and powers discovery via <strong>Apple Maps</strong>, <strong>Siri</strong>, and <strong>Spotlight Search</strong>. If your business isn\'t listed there, you miss visibility for a large share of mobile users — even if you\'re on Google and Bing.'},
   {k:['why listing','listing important','listing benefit','business listing why'],t:'BUSINESS LISTINGS',a:'Verified business listings help customers find you in local searches, provide your hours and contact info in one click, allow customers to leave reviews, and signal to Google that your business is legitimate. They are one of the <strong>highest-ROI visibility investments</strong> any local business can make.'},
   {k:['listing information','listing content','listing setup','what listing'],t:'BUSINESS LISTINGS',a:'Daniel handles business name, address, phone number, website URL, hours of operation, business categories, description, logo, cover photo, and additional photos. He also assists with the verification process and ensures your information is consistent across all three platforms.'},
   {k:['ongoing listing','listing management','listing monthly','listing update'],t:'BUSINESS LISTINGS',a:'Yes. Pro and Elite listing packages include monthly updates, review monitoring, performance reports, photo refreshes, and corrections if Google auto-suggests changes to your listing. Keeping listings accurate and active is important for maintaining local search rankings.'},
@@ -142,7 +284,18 @@ const KB=[
   {k:['where','location','based','british columbia','bc','canada'],t:'CONTACT',a:'Daniel works remotely from <strong>British Columbia, Canada</strong>, and serves clients across Canada and internationally. Remote work means lower overhead and better value — and he\'s experienced at collaborating with clients in different time zones.'},
   {k:['hours','business hours','open','when','available','monday','friday'],t:'CONTACT',a:'Monday to Friday, <strong>8:00 AM to 6:00 PM Pacific Time</strong>. Daniel does his best to respond to all inquiries within one business day.'},
   {k:['contact','reach','email','phone','call','get in touch'],t:'CONTACT',a:'<strong>Email:</strong> danieldavidwilds@gmail.com<br><strong>Phone:</strong> (604) 901-1692<br><br>Email is the fastest way to reach Daniel and allows you to share files, links, and detailed information. He\'s also happy to schedule a call to discuss your project in detail.'},
-  {k:['quote','estimate','free quote','no obligation','how do i get'],t:'CONTACT',a:'Send an email or call with a brief description of your project — what type of site you need, your goals, and any features or services you\'re interested in. Daniel will follow up with a <strong>free, no-obligation quote</strong> tailored to your specific needs.'}
+  {k:['quote','estimate','free quote','no obligation','how do i get'],t:'CONTACT',a:'Send an email or call with a brief description of your project — what type of site you need, your goals, and any features or services you\'re interested in. Daniel will follow up with a <strong>free, no-obligation quote</strong> tailored to your specific needs.'},
+
+  {k:['services','what services','what do you offer','offerings','can you help with'],t:'SERVICES',a:'Daniel can help with: <strong>website design & development</strong> (custom HTML or WordPress), <strong>eCommerce</strong> (WooCommerce/Shopify), <strong>SEO</strong>, <strong>business listings</strong> (Google/Bing/Apple), <strong>branding</strong> (logos/visuals), <strong>copywriting</strong>, and <strong>maintenance</strong> for ongoing updates and support.'},
+  {k:['budget','budget range','how much should i spend','what does 5000 get','what does 2000 get','price range','diy','starter business','professional','advanced','enterprise'],t:'BUDGET TIERS (GUIDE)',a:'<span class="tag">BUDGET TIERS (GUIDE)</span><br><strong>$99–$500</strong>: DIY builders (Wix/Squarespace/WordPress.com), basic one-pagers, small freelancer gigs<br><strong>$500–$2,000</strong>: Starter business sites (custom WP/Shopify setup, basic SEO, forms, responsive design)<br><strong>$2,000–$5,000</strong>: Professional presence (custom UI/UX, CMS, eCommerce, copy + SEO, analytics/integrations)<br><strong>$5,000–$10,000</strong>: Advanced functionality & branding (bespoke design, custom dev, performance/security/accessibility audits)<br><strong>$10,000+</strong>: Enterprise/scalable platforms (full-stack, DevOps, headless CMS, advanced features, ongoing SLA support)<br><br>If you tell me your industry + goals + pages/features, I can suggest the best tier.'},
+  {k:['portfolio','examples','work','previous work','show me','case studies'],t:'SERVICES',a:'Yes — Daniel can share examples of past work and relevant samples based on your industry (service business, trades, retail, etc.). Email <strong>danieldavidwilds@gmail.com</strong> and mention what style you like, and he\'ll send the closest matches.'},
+  {k:['booking','book','hire','start','get started','next step'],t:'PROCESS',a:'The fastest way to start is to email <strong>danieldavidwilds@gmail.com</strong> with: your business type, the kind of website you want (HTML/WordPress/eCommerce), how many pages you expect, and any must-have features. Daniel will reply with questions + a clear next step and timeline.'},
+  {k:['what do you need from me','what do i need to provide','content','images','text','logo'],t:'PROCESS',a:'To move quickly, Daniel typically needs: your <strong>logo/branding</strong> (if you have it), the <strong>pages</strong> you want, your <strong>text content</strong> (or notes for copywriting), <strong>photos</strong> (or examples), and any <strong>links</strong> to competitor sites you like. If you don\'t have content yet, he can help you organize it.'},
+  {k:['hosting','host','where is it hosted','server','web host'],t:'OWNERSHIP',a:'Hosting can be set up on a provider that fits your budget and needs. The key point: your hosting and domain should be in <strong>your name</strong> so you stay in control. Daniel can recommend options and help set everything up.'},
+  {k:['domain','buy a domain','domain name','dns','email domain'],t:'OWNERSHIP',a:'Yes — Daniel can help you choose and set up a domain, connect DNS, and (if you want) set up professional email. Domains are usually an annual cost, and you should own the registrar account.'},
+  {k:['accessibility','a11y','ada','wcag','accessible'],t:'GENERAL WEB DESIGN',a:'Daniel can build with accessibility in mind (clear headings, readable contrast, keyboard-friendly navigation, alt text, and good structure). If you have a specific compliance target (like WCAG level), mention it up front so it can be scoped properly.'},
+  {k:['contact form','forms','lead form','quote form'],t:'CUSTOM HTML',a:'Yes. Contact/quote forms can be added to custom HTML or WordPress sites. The form can send leads to email and include anti-spam protection. If you have a preferred CRM or form service, Daniel can integrate it.'},
+  {k:['maintenance cost','monthly maintenance','ongoing support cost','support pricing'],t:'MAINTENANCE',a:'Maintenance is optional and depends on how often you want updates, backups, security checks, and content changes. If you describe your site type and how hands-on you want to be, Daniel can recommend the simplest plan that covers it.'}
 ];
 
 const CHIPS=[
@@ -154,17 +307,121 @@ const CHIPS=[
   {l:'📞 Contact Daniel',q:'How can I contact you?'}
 ];
 
-const FALLBACK="I don't have a specific answer for that, but Daniel would love to help! Reach out directly at <strong>danieldavidwilds@gmail.com</strong> or call <strong>(604) 901-1692</strong> — he responds within one business day.";
+const FALLBACK="I don't have a specific answer for that yet — but I can help with <strong>pricing</strong>, <strong>HTML vs WordPress</strong>, <strong>eCommerce</strong>, <strong>SEO</strong>, <strong>business listings</strong>, and <strong>contact info</strong>.\n\nIf you tell me what you're trying to achieve (and your industry), I\'ll point you to the right option. You can also reach Daniel at <strong>danieldavidwilds@gmail.com</strong> or <strong>(604) 901-1692</strong>.";
+
+function prepKB(){
+  for(const e of KB){
+    const topicTokens=[...new Set([...tokenize(e.t), ...e.k.flatMap(tokenize)])];
+    e._topicTokens=topicTokens;
+  }
+}
+
+function scoreEntry(qNorm,qTokens,e){
+  let score=0;
+  const HIGH_SIGNAL=new Set([
+    'woocommerce','shopify','ecommerce','wordpress','html','seo',
+    'logo','maintenance','plugin','theme','brand','copywrit','audit','performance','setup'
+  ]);
+  for(const rawKey of e.k){
+    const keyNorm=norm(rawKey);
+    if(!keyNorm) continue;
+    if(qNorm.includes(keyNorm)){
+      score+=6 + Math.min(6, keyNorm.split(' ').length);
+      continue;
+    }
+    const keyTokens=tokenize(rawKey);
+    if(keyTokens.length===0) continue;
+    let matched=0;
+    for(const kt of keyTokens){ if(fuzzyTokenMatch(qTokens,kt)) matched++; }
+    if(matched===0) continue;
+
+    const ratio=matched/keyTokens.length;
+    score+=ratio * (keyTokens.length>=3 ? 5 : 3);
+    if(ratio===1) score+=2;
+    if(keyTokens.length===1 && matched===1 && HIGH_SIGNAL.has(keyTokens[0])) score+=5;
+  }
+
+  const topic=e._topicTokens ?? [];
+  let topicMatches=0;
+  for(const t of topic){ if(qTokens.includes(t)) topicMatches++; }
+  score+=Math.min(3, topicMatches*0.5);
+
+  // Intent boosts to avoid ambiguous matches (e.g., "website cost" vs "hosting cost")
+  const hasWebsite=qTokens.includes('website');
+  const hasPricing=qTokens.includes('cost') || qTokens.includes('price') || qTokens.includes('fee') || qTokens.includes('rate') || qTokens.includes('pricing') || qTokens.includes('much') || qNorm.includes('how much');
+  const hasHosting=qTokens.includes('hosting') || qTokens.includes('domain');
+  const hasEcom=qTokens.includes('ecommerce') || qTokens.includes('woocommerce') || qTokens.includes('shopify');
+  const hasContact=qTokens.includes('contact') || qTokens.includes('email') || qTokens.includes('phone');
+  const hasRobots=qTokens.includes('robot') || qTokens.includes('robots') || qTokens.includes('aurora') || qTokens.includes('maya') || qTokens.includes('riley');
+  const hasDirectories=qTokens.includes('yelp') || qTokens.includes('facebook') || qTokens.includes('yellowpages') || qTokens.includes('foursquare');
+  const hasLogo=qTokens.includes('logo');
+  const hasPlugin=qTokens.includes('plugin');
+  const hasTheme=qTokens.includes('theme');
+  const hasAudit=qTokens.includes('audit');
+  const hasBrand=qTokens.includes('brand') || qTokens.includes('branding');
+  const hasContent=qTokens.includes('content') || qTokens.includes('copywrit');
+  const hasMaintenance=qTokens.includes('maintenance');
+  const hasBackups=qTokens.includes('backup') || qTokens.includes('backups');
+  const hasPayments=qTokens.includes('payment') || qTokens.includes('gateway') || qTokens.includes('payments');
+  const hasOptimization=qTokens.includes('optimization');
+  const hasIntegration=qTokens.includes('integration');
+  const mentionsUpdatesWord=qNorm.includes('updates');
+
+  if(hasPricing && hasWebsite && e.t.startsWith('PRICING')) score+=6;
+  if(hasHosting && !hasWebsite && e.t==='OWNERSHIP') score+=4;
+  if(hasEcom && e.t==='GENERAL WEB DESIGN') score+=3;
+  if(hasContact && e.t==='CONTACT') score+=3;
+  if(hasRobots && e.t==='MEET THE TEAM') score+=3;
+  if(hasDirectories && e.t==='BUSINESS VISIBILITY PACKAGES') score+=6;
+
+  // If the user is clearly asking about price, prefer price entries over general capability descriptions.
+  if(hasPricing && e.t==='GENERAL WEB DESIGN') score-=30;
+
+  // Per-item pricing intent boosts
+  if(hasPricing && e.t.startsWith('PRICE —')) score+=4;
+  if(hasPricing && hasLogo && e.t==='PRICE — LOGO DESIGN') score+=8;
+  if(hasPricing && hasPlugin && e.t==='PRICE — CUSTOM PLUGIN DEVELOPMENT') score+=7;
+  if(hasPricing && hasTheme && e.t==='PRICE — CUSTOM THEME DEVELOPMENT') score+=7;
+  if(hasPricing && hasAudit && e.t==='PRICE — ADVANCED SEO AUDIT') score+=7;
+  if(hasPricing && hasMaintenance && e.t==='PRICE — MONTHLY WEBSITE MAINTENANCE') score+=6;
+  if(hasPricing && hasMaintenance && (hasBackups || hasPlugin) && e.t==='WORDPRESS BREAKDOWN — MAINTENANCE & UPDATES') score+=8;
+  if(hasPricing && hasMaintenance && mentionsUpdatesWord && e.t==='WORDPRESS BREAKDOWN — MAINTENANCE & UPDATES') score+=12;
+  if(hasPricing && hasBrand && e.t==='WORDPRESS BREAKDOWN — DESIGN & BRANDING') score+=7;
+  if(hasPricing && hasContent && e.t==='WORDPRESS BREAKDOWN — CONTENT CREATION') score+=7;
+  if(hasPricing && hasEcom && (hasPayments || qTokens.includes('woocommerce') || hasIntegration) && e.t==='WORDPRESS BREAKDOWN — E-COMMERCE INTEGRATION') score+=10;
+  if(hasPricing && qTokens.includes('seo') && hasOptimization && e.t==='WORDPRESS BREAKDOWN — SEO OPTIMIZATION') score+=10;
+
+  return score;
+}
+
+function topSuggestions(q){
+  const qNorm=norm(q);
+  const baseTokens=tokenize(q);
+  const qTokens=expandWithContext(baseTokens);
+  const scored=KB.map(e=>({e, s: scoreEntry(qNorm,qTokens,e)}))
+    .filter(x=>x.s>0)
+    .sort((a,b)=>b.s-a.s);
+  const seen=new Set();
+  const picks=[];
+  for(const x of scored){
+    if(seen.has(x.e.t)) continue;
+    seen.add(x.e.t);
+    picks.push(x.e.t);
+    if(picks.length>=3) break;
+  }
+  return picks;
+}
 
 function match(q){
-  q=q.toLowerCase();
+  const qNorm=norm(q);
+  const baseTokens=tokenize(q);
+  const qTokens=expandWithContext(baseTokens);
   let best=null,bestScore=0;
   for(const e of KB){
-    let score=0;
-    for(const k of e.k){if(q.includes(k))score+=k.split(' ').length;}
-    if(score>bestScore){bestScore=score;best=e;}
+    const s=scoreEntry(qNorm,qTokens,e);
+    if(s>bestScore){bestScore=s;best=e;}
   }
-  return bestScore>0?best:null;
+  return bestScore>=4?best:null;
 }
 
 function addMsg(text,isUser,tag){
@@ -210,7 +467,14 @@ function respond(q){
   addMsg(q,true);
   const hit=match(q);
   setTimeout(()=>{
-    addMsg(hit?hit.a:FALLBACK,false,hit?hit.t:null);
+    if(hit){
+      STATE.lastHit=hit;
+      addMsg(hit.a,false,hit.t);
+      return;
+    }
+    const sugg=topSuggestions(q);
+    const hint=sugg.length?(`<br><br><span class="tag">SUGGESTED</span><br>`+sugg.map(s=>`• ${s}`).join('<br>')):'';
+    addMsg(FALLBACK+hint,false,null);
   },320);
 }
 
@@ -224,6 +488,7 @@ function send(){
 
 document.getElementById('tin').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 
+prepKB();
 addMsg('👋 Hello! I\'m the Robot Sales Assistant for <strong>Daniel Wilds Web Design</strong>. Ask me anything, or tap a topic below to get started. You can also reach Daniel directly at <strong>danieldavidwilds@gmail.com</strong> or <strong>(604) 901-1692</strong>.',false,null);
 addChips();
     </script>
