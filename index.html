@@ -4,19 +4,26 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Robot Sales Assistant</title>
+    <meta name="description" content="Robot Sales Assistant for Daniel Wilds Web Design — pricing, services, and FAQs." />
+    <meta property="og:title" content="Robot Sales Assistant" />
+    <meta property="og:description" content="Ask about Daniel Wilds Web Design services, pricing, SEO, eCommerce, and business listings." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Robot Sales Assistant" />
+    <meta name="twitter:description" content="Ask about Daniel Wilds Web Design services, pricing, SEO, eCommerce, and business listings." />
+    <link rel="canonical" href="" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%A4%96%3C/text%3E%3C/svg%3E" />
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@400;600;700&display=swap');
-
       *{box-sizing:border-box;margin:0;padding:0}
       html{height:100%;background:#080c17}
-      body{min-height:100%;padding:16px;background:#080c17}
+      body{min-height:100%;padding:16px;background:#080c17;font-size:17px}
 
       #cb{font-family:'Exo 2',sans-serif;background:#080c17;border:1px solid rgba(0,255,231,0.25);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;height:600px;width:100%;max-width:760px;margin:0 auto;max-height:calc(100vh - 32px);max-height:calc(100dvh - 32px)}
       .hdr{background:linear-gradient(135deg,#0d1b2a,#112244);padding:15px 20px;display:flex;align-items:center;gap:13px;border-bottom:1px solid rgba(0,255,231,0.25);flex-shrink:0}
-      .av{width:44px;height:44px;min-width:44px;background:rgba(0,255,231,0.1);border:1px solid #00ffe7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px}
+      .av{width:44px;height:44px;min-width:44px;background:rgba(0,255,231,0.1);border:1px solid #00ffe7;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px}
       .ht{min-width:0}
-      .ht .t1{color:#00ffe7;font-size:13px;font-weight:700;letter-spacing:2.5px;font-family:'Share Tech Mono',monospace;word-break:break-word}
-      .ht .t2{color:rgba(0,255,231,0.45);font-size:10px;letter-spacing:1.2px;margin-top:3px;font-family:'Share Tech Mono',monospace}
+      .ht .t1{color:#00ffe7;font-size:14px;font-weight:700;letter-spacing:2.5px;font-family:'Share Tech Mono',monospace;word-break:break-word}
+      .ht .t2{color:rgba(0,255,231,0.45);font-size:11px;letter-spacing:1.2px;margin-top:3px;font-family:'Share Tech Mono',monospace}
       .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00ffe7;margin-right:5px;animation:blink 1.6s infinite}
       @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
 
@@ -27,56 +34,67 @@
       .msg{display:flex;gap:9px;animation:fu .28s ease}
       @keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
       .msg.u{flex-direction:row-reverse}
-      .mi{width:30px;height:30px;min-width:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px}
+      .mi{width:30px;height:30px;min-width:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:2px}
       .msg.b .mi{background:rgba(0,255,231,0.1);border:1px solid #00ffe7}
       .msg.u .mi{background:rgba(160,200,255,0.08);border:1px solid rgba(160,200,255,0.25)}
 
-      .bbl{max-width:80%;padding:11px 14px;font-size:13px;line-height:1.75;color:#c8e6ff;min-width:0;overflow-wrap:anywhere}
+      .bbl{max-width:80%;padding:11px 14px;font-size:14px;line-height:1.75;color:#c8e6ff;min-width:0;overflow-wrap:anywhere}
       .msg.b .bbl{background:#112244;border-left:3px solid #00ffe7;border-radius:4px 13px 13px 13px}
       .msg.u .bbl{background:rgba(0,255,231,0.06);border:1px solid rgba(0,255,231,0.18);border-radius:13px 4px 13px 13px;text-align:right}
 
       .chips{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 6px}
-      .chip{background:transparent;border:1px solid rgba(0,255,231,0.22);color:#00ffe7;padding:5px 11px;border-radius:20px;font-size:11px;font-family:'Share Tech Mono',monospace;cursor:pointer;transition:all .18s}
+      .chip{background:transparent;border:1px solid rgba(0,255,231,0.22);color:#00ffe7;padding:5px 11px;border-radius:20px;font-size:12px;font-family:'Share Tech Mono',monospace;cursor:pointer;transition:all .18s}
       .chip:hover{background:rgba(0,255,231,0.1);border-color:#00ffe7}
 
       .inp-row{padding:12px 16px;border-top:1px solid rgba(0,255,231,0.18);background:#0a0f1e;display:flex;gap:10px;flex-shrink:0;align-items:center}
-      #tin{flex:1;min-width:0;background:#0f1e35;border:1px solid rgba(0,255,231,0.22);border-radius:8px;padding:9px 13px;color:#c8e6ff;font-size:13px;font-family:'Exo 2',sans-serif;outline:none}
+      #tin{flex:1;min-width:0;background:#0f1e35;border:1px solid rgba(0,255,231,0.22);border-radius:8px;padding:9px 13px;color:#c8e6ff;font-size:14px;font-family:'Exo 2',sans-serif;outline:none}
       #tin::placeholder{color:rgba(200,230,255,0.3)}
       #tin:focus{border-color:rgba(0,255,231,0.5)}
-      #sbtn{background:rgba(0,255,231,0.1);border:1px solid #00ffe7;color:#00ffe7;border-radius:8px;padding:9px 15px;font-size:13px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:1px;transition:all .18s;white-space:nowrap}
+      #sbtn{background:rgba(0,255,231,0.1);border:1px solid #00ffe7;color:#00ffe7;border-radius:8px;padding:9px 15px;font-size:14px;font-family:'Share Tech Mono',monospace;cursor:pointer;letter-spacing:1px;transition:all .18s;white-space:nowrap}
       #sbtn:hover{background:rgba(0,255,231,0.2)}
+      #sbtn:disabled{opacity:0.6;cursor:not-allowed}
+
+      .chip:focus-visible, #sbtn:focus-visible, #tin:focus-visible{outline:2px solid rgba(0,255,231,0.55);outline-offset:2px}
+
+      .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+      .skip{position:absolute;left:10px;top:10px;z-index:9999;background:#0a0f1e;border:1px solid rgba(0,255,231,0.35);color:#00ffe7;padding:8px 12px;border-radius:10px;font-family:'Share Tech Mono',monospace;font-size:12px;transform:translateY(-140%);transition:transform .15s}
+      .skip:focus{transform:translateY(0)}
 
       strong{color:#00ffe7;font-weight:600}
-      .tag{display:inline-block;font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;color:rgba(0,255,231,0.5);margin-bottom:4px}
+      .tag{display:inline-block;font-size:11px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;color:rgba(0,255,231,0.5);margin-bottom:4px}
 
       @media (max-width: 520px){
         body{padding:0}
         #cb{height:100vh;height:100dvh;max-height:none;border-radius:0;margin:0;max-width:none}
         .hdr{padding:12px 14px;gap:10px}
-        .av{width:38px;height:38px;min-width:38px;font-size:19px}
-        .ht .t1{font-size:12px;letter-spacing:2px}
-        .ht .t2{font-size:9px;letter-spacing:1px}
+        .av{width:38px;height:38px;min-width:38px;font-size:20px}
+        .ht .t1{font-size:13px;letter-spacing:2px}
+        .ht .t2{font-size:10px;letter-spacing:1px}
         #msgs{padding:12px;gap:10px}
-        .bbl{max-width:88%;font-size:13px}
+        .bbl{max-width:88%;font-size:14px}
         .inp-row{padding:10px 12px;gap:8px}
         #sbtn{padding:9px 12px}
       }
     </style>
   </head>
   <body>
+    <a class="skip" href="#tin">Skip to message input</a>
     <div id="cb">
-      <div class="hdr">
+      <header class="hdr">
         <div class="av">🤖</div>
         <div class="ht">
           <div class="t1">ROBOT SALES ASSISTANT</div>
           <div class="t2"><span class="dot"></span>ONLINE — DANIEL WILDS WEB DESIGN · BRITISH COLUMBIA, CANADA</div>
         </div>
-      </div>
-      <div id="msgs"></div>
-      <div class="inp-row">
-        <input id="tin" placeholder="Ask me anything about Daniel's services..." />
-        <button id="sbtn" onclick="send()">SEND &#9658;</button>
-      </div>
+      </header>
+      <main aria-label="Chat" style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <div id="msgs" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Chat messages"></div>
+        <div class="inp-row" role="group" aria-label="Message input">
+          <label class="sr-only" for="tin">Message</label>
+          <input id="tin" placeholder="Ask me anything about Daniel's services..." autocomplete="off" />
+          <button id="sbtn" type="button" onclick="send()">SEND &#9658;</button>
+        </div>
+      </main>
     </div>
     <script>
     const STATE={lastHit:null};
@@ -113,6 +131,7 @@
       ['landing','landingpage'],['funnel','landingpage'],['squeeze','landingpage'],['salespage','landingpage'],
       ['cloudflare','cdn'],['cdn','cdn'],
       ['webp','imageoptimization'],['lazyloa','imageoptimization'],
+      ['lazyload','imageoptimization'],['lazyloading','imageoptimization'],
       ['bounce','bouncerate'],['conversion','conversionrate'],['cta','calltoaction'],
       ['cwv','corewebvitals'],['lcp','corewebvitals'],['cls','corewebvitals'],['inp','corewebvitals'],
       ['ux','uxui'],['ui','uxui'],['wireframe','uxui'],['mockup','uxui'],
@@ -234,6 +253,77 @@
     }
 
     const KB=[
+  // ── CONVERSATION BASICS ───────────────────────────────────────────────
+  {k:['hi','hello','hey','good morning','good afternoon','good evening','yo'],t:'HELLO',a:'Hi! I\'m the Robot Sales Assistant for <strong>Daniel Wilds Web Design</strong>. Ask me about <strong>pricing</strong>, <strong>timelines</strong>, <strong>HTML vs WordPress</strong>, <strong>eCommerce</strong>, <strong>SEO</strong>, <strong>business listings</strong>, or <strong>contact info</strong>.'},
+  {k:['thanks','thank you','thx','appreciate it','perfect'],t:'YOU\'RE WELCOME',a:'You\'re welcome. If you tell me your <strong>industry</strong>, whether you want <strong>HTML or WordPress</strong>, and roughly how many <strong>pages/features</strong>, I can point you to the best package and a realistic timeline.'},
+  {k:['bye','goodbye','see you','later'],t:'GOODBYE',a:'Thanks for stopping by. If you\'d like a quote, email <strong>danieldavidwilds@gmail.com</strong> or call <strong>(604) 901-1692</strong>. Have a great day.'},
+  {k:['who are you','what are you','what is this','are you a bot','are you human'],t:'ABOUT THIS ASSISTANT',a:'I\'m a simple on-page assistant that answers questions about Daniel\'s services, pricing, and process. I can\'t browse the web or access private accounts — but I can help you choose the right option and explain what\'s included.'},
+  {k:['can you help','help me','what can you answer','what do you know','what can you do'],t:'WHAT I CAN HELP WITH',a:'I can help with <strong>pricing</strong>, <strong>packages</strong>, <strong>timelines</strong>, <strong>HTML vs WordPress</strong>, <strong>eCommerce (WooCommerce/Shopify)</strong>, <strong>SEO</strong>, <strong>business listings</strong>, <strong>branding</strong>, <strong>maintenance</strong>, and <strong>how to get started</strong>.'},
+  {k:['where do i start','how do i start','start a project','get started','next steps','what\'s the first step'],t:'HOW TO START',a:'The fastest start is to email <strong>danieldavidwilds@gmail.com</strong> with: (1) your business type, (2) HTML vs WordPress vs eCommerce, (3) rough page count, (4) must-have features, and (5) any examples you like. Daniel will reply with a clear scope, timeline, and quote.'},
+  {k:['what do you need','what do you need from me','what should i send','what info do you need','requirements for quote','to quote'],t:'WHAT DANIEL NEEDS FROM YOU',a:'To quote accurately, Daniel typically needs: your business type, goals, preferred style/examples, estimated pages, required features (forms/booking/store), and any content you already have (logo, text, photos). If you don\'t have content yet, he can help organize it.'},
+  {k:['how does it work','process','steps','workflow','how do you build a website'],t:'PROCESS OVERVIEW',a:'Typical workflow: <strong>discovery</strong> (goals + content), <strong>design</strong> (layout/look), <strong>build</strong> (development), <strong>review</strong> (edits), then <strong>launch</strong>. You\'ll get milestone updates along the way.'},
+  {k:['revisions','how many revisions','revision rounds','changes included'],t:'REVISIONS',a:'Most packages include <strong>2–3 rounds of revisions</strong> (defined in the agreement). The goal is to gather clear requirements up front so revisions are usually small refinements, not re-dos.'},
+  {k:['refund','refunds','money back','cancellation','cancel','guarantee'],t:'REFUNDS & CANCELLATIONS',a:'Web projects involve time and custom work, so refunds depend on what\'s already been completed and what\'s stated in the agreement. If you\'re concerned about risk, ask Daniel to outline <strong>milestones</strong> and <strong>deliverables</strong> clearly before work begins.'},
+  {k:['book a call','consultation','schedule a call','free consultation'],t:'BOOK A CONSULTATION',a:'Yes — Daniel offers a <strong>free, no-obligation consultation</strong>. Email <strong>danieldavidwilds@gmail.com</strong> or call <strong>(604) 901-1692</strong>. If you share your business type + goals in the first message, the call is much more productive.'},
+  {k:['what\'s included','what do i get','deliverables','final files','handoff'],t:'WHAT YOU GET',a:'You\'ll get the finished website plus the deliverables defined in your scope (pages/features, SEO basics, integrations). Daniel emphasizes <strong>ownership</strong> — your domain/hosting in your name and the site is yours once paid in full.'},
+  {k:['maintenance after','after launch support','support after launch','updates after launch'],t:'AFTER LAUNCH',a:'After launch, Daniel can support you via <strong>maintenance plans</strong> (updates, backups, security monitoring, small edits) or one-off requests. Tell me if your site is WordPress or HTML and how often you expect changes — I\'ll suggest the simplest approach.'},
+  {k:['i have no idea','not sure','what should i do','recommend','which package','what package'],t:'RECOMMENDATION',a:'No problem — I can guide you. Quick questions: (1) Do you need a <strong>blog</strong> or frequent edits? (WordPress) (2) Do you need a <strong>store</strong>? (WooCommerce/Shopify) (3) Roughly how many pages? With those answers, I\'ll recommend the closest package and starting price.'},
+
+  // ── COST & PRICING (COMMON QUESTIONS) ─────────────────────────────────
+  {k:['why is web design so expensive','why is web design expensive','why so expensive','expensive','cost so much','why does it cost so much'],t:'PRICING — WHY IT COSTS',a:'Web design pricing reflects the time and skill involved: planning, design, development, mobile optimization, SEO setup, performance, security, testing, and revisions. Daniel builds sites to <strong>perform</strong> (speed, trust, conversions) — not just look good. If you share your budget range, he can scope the simplest solution that still gets results.'},
+  {k:['what affects the price','what affects cost','what determines the price','pricing factors','cost factors','what changes the price'],t:'PRICING — WHAT AFFECTS COST',a:'Main pricing drivers: number of pages, custom design depth, features (forms/booking/store), copywriting/content, SEO scope, integrations, and how complex the build is (HTML vs WordPress vs eCommerce). Timeline/rush work can also affect cost.'},
+  {k:['what\'s included in the price','what is included in the price','included in price','what do i get for the price','deliverables included'],t:'PRICING — WHAT\'S INCLUDED',a:'What\'s included depends on the package, but generally: responsive design, core pages, basic SEO setup, and a clean, professional build. Your agreement outlines exact deliverables (pages, features, integrations, and revision rounds) so expectations are crystal clear.'},
+  {k:['payment plans','do you offer payment plans','installments','milestone payments','pay over time'],t:'PRICING — PAYMENT PLANS',a:'For larger projects, Daniel is open to <strong>milestone-based payments</strong>. The simplest approach is usually a deposit to start, then payments tied to clear milestones (design approval, build completion, launch).'},
+  {k:['work within my budget','can you work within my budget','my budget is','tight budget','small budget','limited budget','can you do cheaper'],t:'PRICING — BUDGET FIT',a:'Yes — Daniel can usually scope a smaller first version (fewer pages, leaner features) that fits your budget, then expand later. If you tell me your budget range + goals, I\'ll suggest the closest tier and the best “minimum viable” build.'},
+  {k:['why do different designers charge different prices','why prices vary','why so many different prices','agency vs freelancer','why is one quote higher'],t:'PRICING — WHY PRICES VARY',a:'Prices vary based on experience, quality, scope clarity, process, support, and whether you\'re paying agency overhead. The best comparison is: deliverables, timeline, ownership, performance/SEO setup, revision policy, and what support looks like after launch.'},
+  {k:['branding cost','branding price','how much does branding cost','how much is branding','how much does a logo cost','logo cost','logo price'],t:'PRICING — BRANDING',a:'Logo Design is <strong>$200 CAD</strong>. Full branding work can include colour palette, typography, and usage guidelines — if you tell me what you need (logo only vs full brand kit), I\'ll point you to the right option.'},
+  {k:['go over budget','over budget','what makes a project go over budget','budget creep','scope creep','why projects cost more'],t:'PRICING — OVER BUDGET',a:'Most projects go over budget due to <strong>scope creep</strong> (new pages/features mid-stream), unclear content (copy/images arriving late), or late-stage redesign changes. Clear scope + milestone approvals keep costs predictable.'},
+  {k:['hourly','hourly rate','do you charge hourly','fixed rate','fixed price','quote fixed','hourly or fixed rate'],t:'PRICING — HOURLY VS FIXED',a:'Many website builds are quoted as a <strong>fixed project</strong> (clear scope, clear deliverables). Daniel is also available for <strong>hourly consulting</strong> at <strong>$120 CAD/hour</strong> for strategy, troubleshooting, training, or small tasks.'},
+
+  // ── TIMELINE & PROCESS (COMMON QUESTIONS) ─────────────────────────────
+  {k:['how long will it take to build my website','how long will it take','timeline','timeframe','how many weeks'],t:'TIMELINE',a:'Most projects take <strong>1–4 weeks</strong> depending on scope and how quickly content/feedback comes in. Simple brochure sites can be faster; eCommerce and custom features can take longer. You\'ll get a clear timeline upfront.'},
+  {k:['what slows down a project','what causes delays','project delays','why is it taking so long','what delays a website'],t:'TIMELINE — WHAT SLOWS PROJECTS',a:'Common slowdowns: missing content (text/images), delayed feedback/approvals, changing scope mid-project, and complex integrations. The fastest builds happen when content and decisions are provided early and in one place.'},
+  {k:['how do i give good feedback','feedback tips','how to give feedback','review feedback'],t:'PROCESS — GOOD FEEDBACK',a:'Best feedback is specific and goal-based: “Make the CTA more obvious,” “This section is too long,” “Match this reference style,” and “I want more leads from this page.” Screenshots + bullet lists are perfect.'},
+  {k:['pause the project','pause my project','put on hold','hold the project','stop temporarily'],t:'PROCESS — PAUSING',a:'If you need to pause, tell Daniel as early as possible. The exact impact depends on where the project is in the schedule and what\'s already completed. A simple way to avoid confusion is to pause at a milestone boundary (after design approval, for example).'},
+  {k:['how do we communicate','communication during project','project updates','how will we talk','check ins'],t:'PROCESS — COMMUNICATION',a:'Email, phone, or scheduled video calls — whatever works best. Daniel provides milestone updates and aims to keep communication clear and fast so decisions don\'t stall progress.'},
+  {k:['rush my project','rush','urgent','asap','deadline'],t:'PROCESS — RUSH',a:'Rush options may be available depending on current workload. A rush fee can apply when the timeline is accelerated. Share your deadline and must-have scope and Daniel will tell you what\'s realistic.'},
+  {k:['change my mind','changed my mind','mid project changes','what happens if i change my mind','pivot','switch direction'],t:'PROCESS — CHANGING DIRECTION',a:'Changes are normal, but big direction changes can add time and cost. The cleanest approach is to approve each milestone (layout/design) before moving forward — that way changes are caught early when they\'re cheaper and faster.'},
+
+  // ── BRANDING, DESIGN & CONTENT (COMMON QUESTIONS) ──────────────────────
+  {k:['brand guidelines','do i need brand guidelines','before we start brand guidelines','brand guide','style guide'],t:'BRANDING — DO YOU NEED GUIDELINES?',a:'Not required. If you already have brand assets (logo, colours, fonts), great. If not, Daniel can help define a simple brand direction (palette, typography, tone) so the website looks consistent and professional.'},
+  {k:['content writing','copywriting','do you help with content writing','write my content','write the text'],t:'CONTENT — COPYWRITING',a:'Yes. Daniel offers <strong>website copywriting</strong> at <strong>$120 CAD per page</strong>, and can also create content strategy and ongoing blog writing for SEO when needed.'},
+  {k:['images','photos','do i need to provide images','provide images','stock photos','where do images come from'],t:'CONTENT — IMAGES',a:'If you have strong photos, that\'s best. If not, Daniel can help source and optimize images, and will ensure images are compressed and SEO-friendly (alt text, filenames, WebP where appropriate).'},
+  {k:['match a design style','match a style i like','design style','can you copy this style','reference website'],t:'DESIGN — MATCHING A STYLE',a:'Yes. Send 2–3 example sites you like and tell Daniel what you like about them (layout, vibe, colours, typography). He\'ll capture the style cues while keeping your site unique and aligned with your brand.'},
+  {k:['redesign my logo','refresh my logo','update my logo','improve my logo','logo redesign'],t:'BRANDING — LOGO REFRESH',a:'Yes. Daniel can redesign or refresh an existing logo — keeping what\'s working while modernizing it for a clean, professional look across web and print. If you share your current logo and goals, he can advise the best approach.'},
+  {k:['refresh my current website','redesign my website','website redesign','update my site design','modernize my website'],t:'WEBSITE REDESIGN',a:'Yes. Daniel can modernize your current website — visuals, speed, content clarity, and SEO — and recommend whether you need a refresh or a full rebuild.'},
+  {k:['photography','video services','photography services','do you offer photography','do you offer video','video editing'],t:'PHOTO & VIDEO',a:'Daniel can help with <strong>photo guidance</strong> (what to shoot, standards) and offers <strong>short-form video editing</strong> for Reels/Shorts. If you need full photography/videography on-site, mention your location and goals so the best option can be discussed.'},
+  {k:['seo content','help with seo content','blog content for seo','content for ranking','write seo articles'],t:'SEO — CONTENT HELP',a:'Yes. Daniel can help with SEO-focused content via keyword research, content strategy, and ongoing blog writing. The goal is content that matches buyer intent and helps you rank for the terms your customers actually search.'},
+  {k:['business cards','print materials','brochure','flyer','letterhead','print design'],t:'PRINT DESIGN',a:'Yes. Daniel designs print materials like <strong>business cards</strong>, <strong>brochures/flyers</strong>, and <strong>letterhead</strong> — delivered as print-ready files you can take to any printer.'},
+  {k:['choose colors','choose colours','choose fonts','typography','color palette','colour palette'],t:'BRANDING — COLOURS & FONTS',a:'Yes. Daniel can help you choose a colour palette and typography that fits your industry and brand personality, while staying readable and accessible. This is often included as part of branding and website design.'},
+
+  // ── FEATURES, FUNCTIONALITY & TECHNICAL (COMMON QUESTIONS) ─────────────
+  {k:['what features can my site have','what features','features list','what can you add','what can my website do'],t:'FEATURES',a:'Common features: contact/quote forms, booking/scheduling, galleries, maps, eCommerce, blog, analytics, live chat, email signup, integrations (CRM, email marketing), and custom tools like calculators. Tell me your business type and goal and I\'ll suggest the best feature set.'},
+  {k:['which platform should i use','which platform','best platform','html or wordpress','wordpress or html','shopify or woocommerce','platform recommendation'],t:'PLATFORM CHOICE',a:'If you want fast, low-maintenance, mostly-static pages → <strong>custom HTML</strong>. If you want frequent edits, blogging, or easy content management → <strong>WordPress</strong>. If you want a hosted retail-first store → <strong>Shopify</strong>. If you want store + full site flexibility under WordPress → <strong>WooCommerce</strong>.'},
+  {k:['bug or user error','is this a bug','is this broken','not working','why is this happening','troubleshoot'],t:'TROUBLESHOOTING',a:'It depends — some issues are bugs, others are browser/cache/device settings. The fastest diagnosis: what page/feature, what you expected, what happened, device/browser, and any screenshots. Daniel can troubleshoot and fix issues either under maintenance or as a one-off support task.'},
+  {k:['integrate third party tools','third party tools','integrations','connect to','api integration','zapier'],t:'INTEGRATIONS',a:'Yes. Daniel can integrate third-party tools (CRMs, booking apps, email marketing, analytics, payments) via embeds, plugins, APIs, or automations like Zapier — depending on the platform you choose.'},
+  {k:['online store','build an online store','sell online','ecommerce store','shop'],t:'ECOMMERCE',a:'Yes. Daniel builds online stores using <strong>WooCommerce</strong> (WordPress) or <strong>Shopify</strong> — including product setup, payments, shipping/tax configuration, and training so you can manage it.'},
+  {k:['booking system','booking','appointments','schedule online','reservation system'],t:'BOOKING',a:'Yes. Daniel integrates booking systems like <strong>Calendly</strong> or <strong>Acuity</strong>, or can build booking/quote forms tailored to your business.'},
+  {k:['secure','security','safe','will my site be secure'],t:'SECURITY',a:'Yes. Security depends on the platform. HTML sites have a very small attack surface. WordPress sites are secured via best practices: updates, strong login protection, hardened settings, SSL, backups, and monitoring (especially under maintenance plans).'},
+  {k:['fast','speed','performance','will my site be fast'],t:'PERFORMANCE',a:'Yes. Daniel prioritizes performance — optimized images, clean code, and sensible integrations. Custom HTML sites are typically extremely fast; WordPress can also be fast with the right setup and optimization.'},
+  {k:['accessible','accessibility','wcag','a11y','can you make my site accessible'],t:'ACCESSIBILITY',a:'Yes. Daniel can build with accessibility in mind (semantic structure, keyboard navigation, readable contrast, alt text, and properly labeled forms). If you need a specific WCAG target, mention it up front so it can be scoped.'},
+
+  // ── OWNERSHIP, LAUNCH & AFTER-CARE (COMMON QUESTIONS) ──────────────────
+  {k:['do i own my website','do i own the website','ownership','who owns','is it mine'],t:'OWNERSHIP',a:'Yes. You own the website and deliverables once paid in full. Daniel also recommends your <strong>domain and hosting</strong> are always in your name so you stay in control.'},
+  {k:['what happens after launch','after launch','post launch','once it\'s live'],t:'AFTER LAUNCH',a:'After launch, Daniel can handle updates via a maintenance plan or one-off requests. You can also discuss SEO, ads, listings, and ongoing improvements based on real analytics.'},
+  {k:['update the site myself','can i update it myself','edit my site myself','manage content'],t:'UPDATING YOUR SITE',a:'If it\'s <strong>WordPress</strong>, yes — you can update pages/posts/products, and Daniel provides training if needed. If it\'s a custom <strong>HTML</strong> site, updates are typically handled by Daniel (or via a maintenance arrangement).'},
+  {k:['maintenance plans','maintenance plan','care plan','do you offer maintenance'],t:'MAINTENANCE PLANS',a:'Yes. Maintenance plans can include updates, backups, security monitoring, uptime monitoring, performance checks, and small content changes. You can choose a light plan or a more hands-on plan depending on how often you want changes.'},
+  {k:['hosting and domains','hosting','domain','who handles hosting','who handles domains'],t:'HOSTING & DOMAINS',a:'Daniel can help set up hosting and your domain, but the best practice is that <strong>accounts are in your name</strong>. That way you always own your infrastructure and can move providers any time.'},
+  {k:['something breaks later','what if something breaks','site broke','broken later','support later'],t:'SUPPORT',a:'If something breaks later, Daniel can fix it — either through a maintenance plan (priority support) or as a one-off support request. Regular backups and updates reduce the chance of emergencies.'},
+  {k:['training','do you provide training','teach me','show me how','cms training'],t:'TRAINING',a:'Yes. Daniel offers training so you can manage your site confidently (WordPress/Shopify editing, menus, products, and SEO basics).'},
+  {k:['measure success','how do we measure success','kpis','analytics','what\'s working','track results'],t:'MEASURING SUCCESS',a:'Success is measured by outcomes: leads, calls, form submissions, bookings, sales, and rankings — not just traffic. Daniel can set up analytics (GA4/Search Console) and define conversion events so you can track what\'s working.'},
+  {k:['marketing after launch','help with marketing','ads after launch','promote my site','grow traffic'],t:'MARKETING AFTER LAUNCH',a:'Yes. Daniel can help with SEO, business listings, Google Ads, social ads, email marketing, and conversion improvements after launch. Tell me your industry + goal (leads vs sales vs bookings) and I\'ll recommend the best channel mix.'},
+  {k:['improve my google ranking','rank higher','google ranking','seo help','get found on google','show up on google'],t:'SEO — IMPROVE RANKING',a:'Yes. Improving rankings is a mix of technical SEO (speed, structure), on-page SEO (content/keywords), and off-page signals (links, listings, reviews). Daniel builds the foundation correctly and can provide ongoing SEO if you want to keep climbing over time.'},
+
   // ── ORIGINAL ENTRIES ─────────────────────────────────────────────────────
   {k:['aurora','corporate','b2b','enterprise','boardroom'],t:'MEET THE TEAM',a:'<strong>Aurora</strong> is the corporate tech representative — precise, data-driven, and professional. She excels in B2B enterprise environments, boardroom presentations, and tech sector sales. Her communication style is clear, confident, and backed by numbers. Aurora wears tailored blazers and structured professional attire that commands authority in any boardroom.'},
   {k:['maya','retail','lifestyle','boutique','fashion','beauty'],t:'MEET THE TEAM',a:'<strong>Maya</strong> is the retail lifestyle specialist — warm, personable, and fashion-forward. She connects with customers on a genuine human level, making her ideal for boutique retail, beauty, fashion, and lifestyle brands. Maya\'s styling follows Canadian smart-casual standards with a contemporary edge that puts shoppers at ease.'},
@@ -778,6 +868,19 @@ const CHIPS = [
       return bestScore>=4?best:null;
     }
 
+    function setUIBusy(isBusy){
+      const tin=document.getElementById('tin');
+      const btn=document.getElementById('sbtn');
+      const msgs=document.getElementById('msgs');
+      if(!btn.dataset.readyLabel) btn.dataset.readyLabel=btn.textContent;
+
+      tin.disabled=!!isBusy;
+      btn.disabled=!!isBusy;
+      msgs.setAttribute('aria-busy', isBusy ? 'true' : 'false');
+
+      btn.textContent=isBusy ? 'THINKING…' : btn.dataset.readyLabel;
+    }
+
     function addMsg(text,isUser,tag){
       const msgs=document.getElementById('msgs');
       const wrap=document.createElement('div');
@@ -794,7 +897,11 @@ const CHIPS = [
         bbl.appendChild(t);
       }
       const p=document.createElement('p');
-      p.innerHTML=text;
+      if(isUser){
+        p.textContent=text;
+      }else{
+        p.innerHTML=text;
+      }
       bbl.appendChild(p);
       wrap.appendChild(ico);
       wrap.appendChild(bbl);
@@ -819,16 +926,19 @@ const CHIPS = [
 
     function respond(q){
       addMsg(q,true);
+      setUIBusy(true);
       const hit=match(q);
       setTimeout(()=>{
         if(hit){
           STATE.lastHit=hit;
           addMsg(hit.a,false,hit.t);
+          setUIBusy(false);
           return;
         }
         const sugg=topSuggestions(q);
         const hint=sugg.length?(`<br><br><span class="tag">SUGGESTED</span><br>`+sugg.map(s=>`• ${s}`).join('<br>')):'';
         addMsg(FALLBACK+hint,false,null);
+        setUIBusy(false);
       },320);
     }
 
@@ -843,6 +953,12 @@ const CHIPS = [
     document.getElementById('tin').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 
     prepKB();
+    (function setCanonical(){
+      const link=document.querySelector('link[rel="canonical"]');
+      if(link){
+        try{ link.href=location.href.split('#')[0]; }catch(_e){}
+      }
+    })();
     addMsg('&#128075; Hello! I\'m the Robot Sales Assistant for <strong>Daniel Wilds Web Design</strong>. Ask me anything, or tap a topic below to get started. You can also reach Daniel directly at <strong>danieldavidwilds@gmail.com</strong> or <strong>(604) 901-1692</strong>.',false,null);
     addChips();
     </script>
