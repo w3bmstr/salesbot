@@ -61,6 +61,7 @@
       .skip:focus{transform:translateY(0)}
 
       strong{color:#00ffe7;font-weight:600}
+      mark{background:rgba(0,255,231,0.12);color:#c8e6ff;padding:0 2px;border-radius:3px}
       .tag{display:inline-block;font-size:11px;font-family:'Share Tech Mono',monospace;letter-spacing:2px;color:rgba(0,255,231,0.5);margin-bottom:4px}
 
       @media (max-width: 520px){
@@ -154,6 +155,9 @@
       ['favicon','favicon'],['darkmode','darkmode'],
       ['podcast','podcast'],['affiliate','affiliate'],
       ['pitchdeck','pitchdeck'],['letterhead','letterhead']
+      ,
+      // TAX TERMS
+      ['gst','tax'],['pst','tax'],['hst','tax'],['taxes','tax'],['tax','tax']
     ]);
 
     const FOLLOWUP_HINTS=new Set(['more','details','tell','explain','that','this','it','them','those','he','she','they','what','how']);
@@ -742,6 +746,22 @@
   {k:['exit popup price','150 exit popup','exit intent price'],t:'PRICE — EXIT INTENT POPUP',a:'<strong>Exit Intent Popup Setup</strong> is <strong>$150 CAD</strong>.'},
   {k:['testimonial widget price','120 testimonial widget'],t:'PRICE — TESTIMONIAL WIDGET',a:'<strong>Testimonial & Review Widget Integration</strong> is <strong>$120 CAD</strong>.'},
   {k:['virtual showroom price','500 showroom','demo page price'],t:'PRICE — VIRTUAL SHOWROOM',a:'<strong>Virtual Showroom / Live Demo Page</strong> starts at <strong>$500 CAD</strong>.'}
+  ,
+
+  // ── NEW: PRACTICAL FAQS (DETAILS THAT OFTEN COME UP) ─────────────────
+  {k:['do you use contracts','contract','agreement','statement of work','sow','scope document','terms'],t:'CONTRACTS & SCOPE',a:'Yes — projects are typically defined with a clear <strong>scope</strong> (pages/features), <strong>deliverables</strong>, <strong>timeline</strong>, and <strong>revision rounds</strong>. A written agreement keeps expectations clear and prevents scope creep.'},
+  {k:['invoice','invoices','receipt','proof of payment','billing','can i get an invoice'],t:'INVOICES & RECEIPTS',a:'Yes — Daniel can provide invoices/receipts for project work and services. If you need a specific format (company name, address, PO number), mention it up front.'},
+  {k:['deposit','down payment','retainer','how do i pay','payment method','pay by e transfer','etransfer','e-transfer','credit card','paypal'],t:'PAYMENTS (HOW IT WORKS)',a:'A deposit is typically used to start the project, with remaining payments tied to milestones (design approval, build completion, launch). Payment methods can be discussed during the consultation — just ask what works best for you.'},
+  {k:['can you use my hosting','use my host','existing hosting','i already have hosting','i already have a domain','keep my domain'],t:'USING YOUR EXISTING HOSTING/DOMAIN',a:'Yes. If you already have hosting and/or a domain, Daniel can usually work within that setup — or recommend a move if the current provider is limiting performance, email deliverability, or reliability. The main goal is that <strong>you</strong> own the accounts.'},
+  {k:['who owns the content','ownership of content','do i own my logo','do i own the design','source files'],t:'OWNERSHIP (CONTENT & FILES)',a:'You should expect clear ownership terms in the agreement. Typically: you own your domain/hosting, your content, and the delivered site assets once paid in full. If you need specific source files (logos, print files, design exports), include that in scope.'},
+  {k:['can you work with my content','i have content','i have photos','i have copy','content migration','move my old content'],t:'CONTENT MIGRATION',a:'Yes. Daniel can move content from an existing website into the new one (pages, images, blog posts, products), and can also clean up formatting, optimize images, and preserve URLs where possible to protect SEO.'},
+  {k:['do you provide hosting','do you host websites','managed hosting','do you manage hosting'],t:'HOSTING (WHO MANAGES IT)',a:'Daniel can help you choose and set up hosting, but best practice is to keep the hosting account in your name. If you want a fully hands-off setup, you can discuss a managed approach as part of a maintenance plan.'},
+  {k:['what do you need from me to start','what do you need first','kickoff checklist','project kickoff'],t:'KICKOFF CHECKLIST',a:'To start smoothly: (1) your goals + target audience, (2) page list, (3) example sites you like, (4) logo/brand assets (if any), (5) content (text/photos) or notes for copywriting, and (6) any must-have features (forms/booking/store).'},
+  {k:['can you do only seo','seo only','seo without redesign','my site is fine but i need seo'],t:'SEO (WITHOUT A REDESIGN)',a:'Yes. You don\'t always need a redesign to improve SEO. Daniel can do a focused SEO audit + fixes (technical issues, titles/meta, content improvements, internal linking), then optional ongoing SEO if you want continued growth.'},
+  {k:['what happens if i don\'t have content','no photos','no text','i need help writing','i don\'t know what to say'],t:'IF YOU DON\'T HAVE CONTENT YET',a:'That\'s common. Daniel can help structure pages and can write content via copywriting services. A good approach is to start with a simple outline (services, locations, differentiators, FAQs), then refine into final copy.'},
+  {k:['do you offer revisions','how many changes','edit rounds','revision policy'],t:'REVISION POLICY (DETAIL)',a:'Most packages include a defined number of revision rounds. The easiest way to keep revisions fast is to agree on structure early (pages/sections), then refine wording and visuals after the main layout is approved.'}
+  ,
+  {k:['gst','pst','hst','tax','taxes','do you charge tax','tax on invoice','is tax included'],t:'TAXES (GST/PST/HST)',a:'Taxes can depend on the specifics of the service and the invoicing details. The simplest approach is to ask Daniel to confirm whether taxes apply to your quote/invoice (and whether pricing is shown as tax-included or plus tax) before you approve the scope.'}
 ];
 
 const CHIPS = [
@@ -756,116 +776,161 @@ const CHIPS = [
 
     const FALLBACK="I don't have a specific answer for that yet — but I can help with <strong>pricing</strong>, <strong>HTML vs WordPress</strong>, <strong>eCommerce</strong>, <strong>SEO</strong>, <strong>business listings</strong>, and <strong>contact info</strong>.\n\nIf you tell me what you're trying to achieve (and your industry), I\'ll point you to the right option. You can also reach Daniel at <strong>danieldavidwilds@gmail.com</strong> or <strong>(604) 901-1692</strong>.";
 
-    function prepKB(){
-      for(const e of KB){
-        const topicTokens=[...new Set([...tokenize(e.t), ...e.k.flatMap(tokenize)])];
-        e._topicTokens=topicTokens;
-      }
+    function stripHtml(html){
+      return String(html)
+        .replace(/<[^>]*>/g,' ')
+        .replace(/&nbsp;/g,' ')
+        .replace(/&#\d+;/g,' ')
+        .replace(/&[a-z]+;/gi,' ')
+        .replace(/\s+/g,' ')
+        .trim();
     }
 
-    function scoreEntry(qNorm,qTokens,e){
-      let score=0;
-      const HIGH_SIGNAL=new Set([
-        'woocommerce','shopify','ecommerce','wordpress','html','seo',
-        'logo','maintenance','plugin','theme','brand','copywrit','audit','performance','setup'
-      ]);
-      for(const rawKey of e.k){
-        const keyNorm=norm(rawKey);
-        if(!keyNorm) continue;
-        if(qNorm.includes(keyNorm)){
-          score+=6 + Math.min(6, keyNorm.split(' ').length);
-          continue;
-        }
-        const keyTokens=tokenize(rawKey);
-        if(keyTokens.length===0) continue;
-        let matched=0;
-        for(const kt of keyTokens){ if(fuzzyTokenMatch(qTokens,kt)) matched++; }
-        if(matched===0) continue;
+    const KB_INDEX={
+      ready:false,
+      docs:[],
+      df:new Map(),
+      avgLen:0,
+      titleToBestDocIdx:new Map(),
+    };
 
-        const ratio=matched/keyTokens.length;
-        score+=ratio * (keyTokens.length>=3 ? 5 : 3);
-        if(ratio===1) score+=2;
-        if(keyTokens.length===1 && matched===1 && HIGH_SIGNAL.has(keyTokens[0])) score+=5;
+    function buildKBIndex(){
+      const docs=[];
+      const df=new Map();
+      let totalLen=0;
+
+      for(const e of KB){
+        const keysText=Array.isArray(e.k)?e.k.join(' '):'';
+        const answerText=stripHtml(e.a);
+        const titleText=String(e.t||'');
+
+        // Topic tokens are used for follow-up context expansion.
+        const topicTokens=[...new Set([...tokenize(titleText), ...tokenize(keysText)])];
+        e._topicTokens=topicTokens;
+
+        // Index title + keywords + answer text (answer gets less weight by duplication)
+        const combined=`${titleText} ${keysText} ${answerText}`;
+        const tokens=tokenize(combined);
+        const tf=new Map();
+        for(const t of tokens){ tf.set(t, (tf.get(t)||0)+1); }
+        const len=tokens.length || 1;
+
+        const unique=new Set(tokens);
+        for(const t of unique){ df.set(t, (df.get(t)||0)+1); }
+
+        totalLen+=len;
+        docs.push({e, tf, len, answerText, titleText, keysText});
       }
 
-      const topic=e._topicTokens ?? [];
-      let topicMatches=0;
-      for(const t of topic){ if(qTokens.includes(t)) topicMatches++; }
-      score+=Math.min(3, topicMatches*0.5);
+      const N=docs.length || 1;
+      const avgLen=totalLen / N;
+      KB_INDEX.docs=docs;
+      KB_INDEX.df=df;
+      KB_INDEX.avgLen=avgLen;
+      KB_INDEX.ready=true;
+    }
 
-      const hasWebsite=qTokens.includes('website');
-      const hasPricing=qTokens.includes('cost') || qTokens.includes('price') || qTokens.includes('fee') || qTokens.includes('rate') || qTokens.includes('pricing') || qTokens.includes('much') || qNorm.includes('how much');
-      const hasHosting=qTokens.includes('hosting') || qTokens.includes('domain');
-      const hasEcom=qTokens.includes('ecommerce') || qTokens.includes('woocommerce') || qTokens.includes('shopify');
-      const hasContact=qTokens.includes('contact') || qTokens.includes('email') || qTokens.includes('phone');
-      const hasRobots=qTokens.includes('robot') || qTokens.includes('robots') || qTokens.includes('aurora') || qTokens.includes('maya') || qTokens.includes('riley');
-      const hasDirectories=qTokens.includes('yelp') || qTokens.includes('facebook') || qTokens.includes('yellowpages') || qTokens.includes('foursquare');
-      const hasLogo=qTokens.includes('logo');
-      const hasPlugin=qTokens.includes('plugin');
-      const hasTheme=qTokens.includes('theme');
-      const hasAudit=qTokens.includes('audit');
-      const hasBrand=qTokens.includes('brand') || qTokens.includes('branding');
-      const hasContent=qTokens.includes('content') || qTokens.includes('copywrit');
-      const hasMaintenance=qTokens.includes('maintenance');
-      const hasBackups=qTokens.includes('backup') || qTokens.includes('backups');
-      const hasPayments=qTokens.includes('payment') || qTokens.includes('gateway') || qTokens.includes('payments');
-      const hasOptimization=qTokens.includes('optimization');
-      const hasIntegration=qTokens.includes('integration');
-      const mentionsUpdatesWord=qNorm.includes('updates');
+    function bm25Score(qTokens, doc){
+      // Standard BM25
+      const k1=1.35;
+      const b=0.75;
+      const N=KB_INDEX.docs.length || 1;
 
-      if(hasPricing && hasWebsite && e.t.startsWith('PRICING')) score+=6;
-      if(hasHosting && !hasWebsite && e.t==='OWNERSHIP') score+=4;
-      if(hasEcom && e.t==='GENERAL WEB DESIGN') score+=3;
-      if(hasContact && e.t==='CONTACT') score+=3;
-      if(hasRobots && e.t==='MEET THE TEAM') score+=3;
-      if(hasDirectories && e.t==='BUSINESS VISIBILITY PACKAGES') score+=6;
-
-      if(hasPricing && e.t==='GENERAL WEB DESIGN') score-=30;
-
-      if(hasPricing && e.t.startsWith('PRICE —')) score+=4;
-      if(hasPricing && hasLogo && e.t==='PRICE — LOGO DESIGN') score+=8;
-      if(hasPricing && hasPlugin && e.t==='PRICE — CUSTOM PLUGIN DEVELOPMENT') score+=7;
-      if(hasPricing && hasTheme && e.t==='PRICE — CUSTOM THEME DEVELOPMENT') score+=7;
-      if(hasPricing && hasAudit && e.t==='PRICE — ADVANCED SEO AUDIT') score+=7;
-      if(hasPricing && hasMaintenance && e.t==='PRICE — MONTHLY WEBSITE MAINTENANCE') score+=6;
-      if(hasPricing && hasMaintenance && (hasBackups || hasPlugin) && e.t==='WORDPRESS BREAKDOWN — MAINTENANCE & UPDATES') score+=8;
-      if(hasPricing && hasMaintenance && mentionsUpdatesWord && e.t==='WORDPRESS BREAKDOWN — MAINTENANCE & UPDATES') score+=12;
-      if(hasPricing && hasBrand && e.t==='WORDPRESS BREAKDOWN — DESIGN & BRANDING') score+=7;
-      if(hasPricing && hasContent && e.t==='WORDPRESS BREAKDOWN — CONTENT CREATION') score+=7;
-      if(hasPricing && hasEcom && (hasPayments || qTokens.includes('woocommerce') || hasIntegration) && e.t==='WORDPRESS BREAKDOWN — E-COMMERCE INTEGRATION') score+=10;
-      if(hasPricing && qTokens.includes('seo') && hasOptimization && e.t==='WORDPRESS BREAKDOWN — SEO OPTIMIZATION') score+=10;
-
+      let score=0;
+      const seen=new Set();
+      for(const term of qTokens){
+        if(seen.has(term)) continue;
+        seen.add(term);
+        const tf=doc.tf.get(term) || 0;
+        if(tf<=0) continue;
+        const df=KB_INDEX.df.get(term) || 0;
+        const idf=Math.log(1 + (N - df + 0.5) / (df + 0.5));
+        const denom=tf + k1 * (1 - b + b * (doc.len / (KB_INDEX.avgLen || 1)));
+        score += idf * (tf * (k1 + 1)) / (denom || 1);
+      }
       return score;
     }
 
-    function topSuggestions(q){
-      const qNorm=norm(q);
-      const baseTokens=tokenize(q);
-      const qTokens=expandWithContext(baseTokens);
-      const scored=KB.map(e=>({e, s: scoreEntry(qNorm,qTokens,e)}))
-        .filter(x=>x.s>0)
-        .sort((a,b)=>b.s-a.s);
-      const seen=new Set();
-      const picks=[];
-      for(const x of scored){
-        if(seen.has(x.e.t)) continue;
-        seen.add(x.e.t);
-        picks.push(x.e.t);
-        if(picks.length>=3) break;
-      }
-      return picks;
+    function phraseBoost(qNorm, doc){
+      // Small deterministic boosts for exact phrases appearing in title/keywords.
+      let boost=0;
+      if(!qNorm) return 0;
+      const tNorm=norm(doc.titleText);
+      const kNorm=norm(doc.keysText);
+      if(tNorm && qNorm.includes(tNorm) && tNorm.length>=8) boost+=2.2;
+      if(kNorm && qNorm.includes(kNorm) && kNorm.length>=8) boost+=1.2;
+      if(tNorm && tNorm.includes(qNorm) && qNorm.length>=8) boost+=2.6;
+      return boost;
     }
 
-    function match(q){
+    function buildSnippet(doc, qTokens){
+      const raw=String(doc.answerText || '').trim();
+      const parts=raw.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+      const sentences=parts.map(s=>s.trim()).filter(Boolean);
+      if(sentences.length===0) return '';
+
+      const qSet=new Set(qTokens);
+      let best=sentences[0];
+      let bestScore=-1;
+      for(const s of sentences){
+        const st=tokenize(s);
+        let m=0;
+        for(const t of st){ if(qSet.has(t)) m++; }
+        if(m>bestScore){ bestScore=m; best=s; }
+      }
+
+      // Highlight a few query terms in the snippet.
+      let html=best;
+      const terms=[...new Set(qTokens)].slice(0,6).filter(t=>t.length>=3);
+      for(const t of terms){
+        const re=new RegExp(`\\b${t.replace(/[.*+?^${}()|[\\]\\]/g,'\\\\$&')}\\b`,'gi');
+        html=html.replace(re, m=>`<mark>${m}</mark>`);
+      }
+      return html;
+    }
+
+    function searchKB(q, limit=6){
+      if(!KB_INDEX.ready) buildKBIndex();
       const qNorm=norm(q);
       const baseTokens=tokenize(q);
       const qTokens=expandWithContext(baseTokens);
-      let best=null,bestScore=0;
-      for(const e of KB){
-        const s=scoreEntry(qNorm,qTokens,e);
-        if(s>bestScore){bestScore=s;best=e;}
+
+      if(qTokens.length===0){
+        return { qNorm, qTokens, results: [] };
       }
-      return bestScore>=4?best:null;
+
+      const scored=[];
+      for(const doc of KB_INDEX.docs){
+        const bm=bm25Score(qTokens, doc);
+        if(bm<=0) continue;
+        const s=bm + phraseBoost(qNorm, doc);
+        scored.push({doc, s});
+      }
+
+      scored.sort((a,b)=>b.s-a.s);
+
+      // De-dupe by title, keeping the best scoring doc per title.
+      const seenTitles=new Set();
+      const results=[];
+      for(const x of scored){
+        const title=x.doc.e.t;
+        if(seenTitles.has(title)) continue;
+        seenTitles.add(title);
+        results.push({ e: x.doc.e, score: x.s, snippet: buildSnippet(x.doc, qTokens) });
+        if(results.length>=limit) break;
+      }
+
+      return { qNorm, qTokens, results };
+    }
+
+    function pickBestResult(results){
+      if(!results || results.length===0) return null;
+      return results[0];
+    }
+
+    function topSuggestions(q){
+      const {results}=searchKB(q, 5);
+      return results.map(r=>r.e.t).slice(0,3);
     }
 
     function setUIBusy(isBusy){
@@ -927,14 +992,39 @@ const CHIPS = [
     function respond(q){
       addMsg(q,true);
       setUIBusy(true);
-      const hit=match(q);
+      const {results}=searchKB(q, 6);
+      const best=pickBestResult(results);
       setTimeout(()=>{
-        if(hit){
-          STATE.lastHit=hit;
-          addMsg(hit.a,false,hit.t);
+        if(best && best.score>=1.55){
+          STATE.lastHit=best.e;
+
+          // If there are other strong contenders, show them as related topics.
+          const related=results
+            .slice(1)
+            .filter(r=>r.score >= best.score*0.62)
+            .slice(0,3);
+
+          const relatedHtml=related.length
+            ? (`<br><br><span class="tag">RELATED</span><br>` + related.map(r=>`• <strong>${r.e.t}</strong> — ${r.snippet || ''}`).join('<br>'))
+            : '';
+
+          addMsg(best.e.a + relatedHtml,false,best.e.t);
           setUIBusy(false);
           return;
         }
+
+        // No confident single answer: return a compact ranked list.
+        const list=results.slice(0,5);
+        if(list.length){
+          const html=
+            `<span class="tag">TOP MATCHES</span><br>`+
+            list.map(r=>`• <strong>${r.e.t}</strong> — ${r.snippet || stripHtml(r.e.a).slice(0,120)+'…'}`).join('<br>')+
+            `<br><br>Reply with the title that matches best, or rephrase your question.`;
+          addMsg(html,false,null);
+          setUIBusy(false);
+          return;
+        }
+
         const sugg=topSuggestions(q);
         const hint=sugg.length?(`<br><br><span class="tag">SUGGESTED</span><br>`+sugg.map(s=>`• ${s}`).join('<br>')):'';
         addMsg(FALLBACK+hint,false,null);
@@ -952,7 +1042,7 @@ const CHIPS = [
 
     document.getElementById('tin').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
 
-    prepKB();
+    buildKBIndex();
     (function setCanonical(){
       const link=document.querySelector('link[rel="canonical"]');
       if(link){
