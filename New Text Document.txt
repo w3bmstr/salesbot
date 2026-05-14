@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Robot Sales Assistant — Daniel Wilds Web Design</title>
+  <meta name="description" content="AI-powered sales assistant for Daniel Wilds Web Design — pricing, services, SEO, eCommerce, and more." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%A4%96%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet" />
+ 
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    :root {
+      --cyan:     #00ffe7;
+      --cyan-dim: rgba(0,255,231,0.18);
+      --cyan-glow:rgba(0,255,231,0.08);
+      --navy:     #080c17;
+      --navy2:    #0a0f1e;
+      --navy3:    #0d1728;
+      --navy4:    #112244;
+      --text:     #c8e6ff;
+      --text-dim: rgba(200,230,255,0.45);
+      --mono:     'Share Tech Mono', monospace;
+      --body:     'Exo 2', sans-serif;
+      --radius:   14px;
+      --border:   1px solid var(--cyan-dim);
+    }
+ 
+    html { height: 100%; background: var(--navy); }
+    body { min-height: 100%; padding: 16px; background: var(--navy); font-family: var(--body); font-size: 17px; }
+ 
+    /* ── WIDGET ── */
+    #cb {
+      background: var(--navy);
+      border: 1px solid rgba(0,255,231,0.28);
+      border-radius: var(--radius);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 640px;
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto;
+      max-height: calc(100vh - 32px);
+      box-shadow: 0 0 60px rgba(0,255,231,0.06), 0 0 120px rgba(0,0,0,0.6);
+    }
+ 
+    /* ── HEADER ── */
+    .hdr {
+      background: linear-gradient(135deg, var(--navy3), var(--navy4));
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      border-bottom: var(--border);
+      flex-shrink: 0;
+    }
+    .av {
+      width: 44px; height: 44px; min-width: 44px;
+      background: var(--cyan-glow);
+      border: 1px solid var(--cyan);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 0 12px rgba(0,255,231,0.2);
+    }
+    .ht { min-width: 0; flex: 1; }
+    .ht .t1 {
+      color: var(--cyan);
+      font-size: 13px; font-weight: 700;
+      letter-spacing: 2.5px;
+      font-family: var(--mono);
+    }
+    .ht .t2 {
+      color: var(--text-dim);
+      font-size: 11px; letter-spacing: 1.2px;
+      margin-top: 3px;
+      font-family: var(--mono);
+    }
+    .dot {
+      display: inline-block; width: 6px; height: 6px;
+      border-radius: 50%; background: var(--cyan);
+      margin-right: 5px;
+      animation: blink 1.6s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.15} }
+ 
+    .hdr-badge {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: var(--cyan);
+      background: rgba(0,255,231,0.07);
+      border: 1px solid rgba(0,255,231,0.25);
+      border-radius: 4px;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+ 
+    /* ── MESSAGES ── */
+    #msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+    #msgs::-webkit-scrollbar { width: 3px; }
+    #msgs::-webkit-scrollbar-thumb { background: rgba(0,255,231,0.18); border-radius: 2px; }
+ 
+    .msg { display: flex; gap: 9px; animation: fu .28s ease; }
+    @keyframes fu { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .msg.u { flex-direction: row-reverse; }
+ 
+    .mi {
+      width: 30px; height: 30px; min-width: 30px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0; margin-top: 2px;
+    }
+    .msg.b .mi { background: var(--cyan-glow); border: 1px solid var(--cyan); }
+    .msg.u .mi { background: rgba(160,200,255,0.06); border: 1px solid rgba(160,200,255,0.22); }
+ 
+    .bbl {
+      max-width: 82%;
+      padding: 11px 15px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text);
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .msg.b .bbl {
+      background: var(--navy4);
+      border-left: 3px solid var(--cyan);
+      border-radius: 4px 14px 14px 14px;
+    }
+    .msg.u .bbl {
+      background: rgba(0,255,231,0.05);
+      border: 1px solid rgba(0,255,231,0.16);
+      border-radius: 14px 4px 14px 14px;
+      text-align: right;
+    }
+ 
+    /* markdown-ish rendering */
+    .bbl strong { color: var(--cyan); font-weight: 600; }
+    .bbl em { color: rgba(200,230,255,0.75); font-style: italic; }
+    .bbl ul, .bbl ol { padding-left: 18px; margin: 6px 0; }
+    .bbl li { margin: 3px 0; }
+    .bbl hr { border: none; border-top: 1px solid var(--cyan-dim); margin: 10px 0; }
+    .bbl .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-family: var(--mono);
+      letter-spacing: 2px;
+      color: rgba(0,255,231,0.5);
+      margin-bottom: 5px;
+    }
+    .bbl table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+    .bbl th { color: var(--cyan); font-family: var(--mono); letter-spacing: 1px; border-bottom: 1px solid var(--cyan-dim); padding: 4px 8px; text-align: left; font-size: 11px; }
+    .bbl td { padding: 4px 8px; border-bottom: 1px solid rgba(0,255,231,0.06); }
+ 
+    /* typing indicator */
+    .typing-dots { display: flex; gap: 5px; align-items: center; padding: 6px 0; }
+    .typing-dots span {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--cyan);
+      animation: tdot 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: .2s; }
+    .typing-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes tdot { 0%,80%,100%{opacity:.2;transform:scale(.8)} 40%{opacity:1;transform:scale(1)} }
+ 
+    /* ── CHIPS ── */
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; padding: 2px 0 6px; }
+    .chip {
+      background: transparent;
+      border: 1px solid rgba(0,255,231,0.2);
+      color: var(--cyan);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-family: var(--mono);
+      cursor: pointer;
+      transition: all .18s;
+      letter-spacing: .5px;
+    }
+    .chip:hover { background: rgba(0,255,231,0.1); border-color: var(--cyan); }
+ 
+    /* ── INPUT ROW ── */
+    .inp-row {
+      padding: 12px 16px;
+      border-top: var(--border);
+      background: var(--navy2);
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+      align-items: center;
+    }
+    #tin {
+      flex: 1; min-width: 0;
+      background: var(--navy3);
+      border: 1px solid rgba(0,255,231,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      font-family: var(--body);
+      outline: none;
+      transition: border-color .18s;
+    }
+    #tin::placeholder { color: rgba(200,230,255,0.28); }
+    #tin:focus { border-color: rgba(0,255,231,0.5); }
+    #tin:disabled { opacity: .5; }
+ 
+    #sbtn {
+      background: rgba(0,255,231,0.08);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-family: var(--mono);
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all .18s;
+      white-space: nowrap;
+    }
+    #sbtn:hover:not(:disabled) { background: rgba(0,255,231,0.18); }
+    #sbtn:disabled { opacity: .5; cursor: not-allowed; }
+ 
+    /* ── FOOTER ── */
+    .footer-bar {
+      padding: 7px 16px;
+      border-top: 1px solid rgba(0,255,231,0.08);
+      background: var(--navy2);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: rgba(0,255,231,0.3);
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+    .footer-bar a { color: rgba(0,255,231,0.45); text-decoration: none; }
+    .footer-bar a:hover { color: var(--cyan); }
+ 
+    /* ── ACCESSIBILITY ── */
+    .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
+    :focus-visible { outline: 2px solid rgba(0,255,231,0.5); outline-offset: 2px; }
+ 
+    /* ── MOBILE ── */
+    @media (max-width: 520px) {
+      body { padding: 0; }
+      #cb { height: 100vh; height: 100dvh; max-height: none; border-radius: 0; margin: 0; max-width: none; }
+      .hdr { padding: 11px 14px; gap: 10px; }
+      .av { width: 38px; height: 38px; min-width: 38px; font-size: 19px; }
+      .ht .t1 { font-size: 12px; }
+      .ht .t2 { font-size: 10px; }
+      .hdr-badge { display: none; }
+      #msgs { padding: 12px; gap: 10px; }
+      .bbl { max-width: 90%; font-size: 13px; }
+      .inp-row { padding: 10px 12px; gap: 8px; }
+      #sbtn { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+ 
+<div id="cb" role="main">
+  <header class="hdr">
+    <div class="av" aria-hidden="true">🤖</div>
+    <div class="ht">
+      <div class="t1">ROBOT SALES ASSISTANT</div>
+      <div class="t2"><span class="dot"></span>POWERED BY AI — DANIEL WILDS WEB DESIGN · BC, CANADA</div>
+    </div>
+    <div class="hdr-badge">AI ▸ LIVE</div>
+  </header>
+ 
+  <div id="msgs" role="log" aria-live="polite" aria-relevant="additions text" aria-label="Chat messages"></div>
+ 
+  <div class="inp-row" role="group" aria-label="Message input">
+    <label class="sr-only" for="tin">Message</label>
+    <input id="tin" placeholder="Ask me anything about Daniel's services…" autocomplete="off" maxlength="800" />
+    <button id="sbtn" type="button" onclick="send()">SEND ▶</button>
+  </div>
+ 
+  <div class="footer-bar">
+    <span>© DANIEL WILDS WEB DESIGN</span>
+    <span>
+      <a href="mailto:danieldavidwilds@gmail.com">danieldavidwilds@gmail.com</a>
+      &nbsp;·&nbsp;
+      <a href="tel:6049011692">(604) 901-1692</a>
+    </span>
+  </div>
+</div>
+ 
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// SYSTEM PROMPT  (all knowledge about Daniel's business)
+// ─────────────────────────────────────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are the Robot Sales Assistant for **Daniel Wilds Web Design**, based in British Columbia, Canada.
+ 
+Your job is to answer questions about Daniel's services, pricing, process, and expertise in a friendly, helpful, and professional way. You are knowledgeable, direct, and concise. You never make things up — if you genuinely don't know something, say so and direct the user to contact Daniel.
+ 
+Always use markdown formatting in your replies:
+- Use **bold** for names, prices, and important terms
+- Use bullet lists where appropriate
+- Keep answers focused and scannable
+- End answers that might lead to a purchase with a soft CTA pointing to danieldavidwilds@gmail.com or (604) 901-1692
+ 
+---
+ 
+## ABOUT DANIEL WILDS
+ 
+- **Name:** Daniel Wilds
+- **Brand:** W3B🍁MSTR (stylized "Web Master" with a Canadian maple leaf)
+- **Location:** British Columbia, Canada
+- **Experience:** 20+ years in web design and internet programming
+- **Education:** Graduated 2005 — Internet Programming & Website Design Specialist Diploma from an accredited private post-secondary institution in BC
+- **Remote:** Serves clients across Canada and internationally
+- **Website:** w3bmstr.wordpress.com
+- **Email:** danieldavidwilds@gmail.com
+- **Phone:** (604) 901-1692
+- **Hours:** Monday–Friday, 8:00 AM–6:00 PM Pacific Time
+ 
+Daniel offers direct, personal service — no agency overhead, no junior developers. You deal with the expert from start to finish.
+ 
+---
+ 
+## ROBOT SALES PERSONAS (Team)
+ 
+Daniel's brand features three AI robot saleswomen:
+- **Aurora** — corporate/B2B specialist. Tailored blazers, boardroom-ready, data-driven communication.
+- **Maya** — retail/lifestyle specialist. Smart-casual, warm, ideal for boutiques, beauty, fashion brands.
+- **Riley** — field/on-site specialist. Practical, weather-ready professional wear, trade shows and outdoor settings.
+ 
+Together they represent a full-spectrum sales force for any business context.
+ 
+---
+ 
+## WEB DESIGN PACKAGES
+ 
+| Package | Price | Includes |
+|---|---|---|
+| **Starter Site** | $799 CAD | 1–3 pages, custom design, basic SEO, mobile-friendly |
+| **Business Pro** | $1,499 CAD | Up to 7 pages, SEO optimization, blog, contact form |
+| **E-commerce Package** | $2,299 CAD | Up to 10 pages, WooCommerce store, payment gateway, up to 25 products |
+| **Custom Solution** | from $3,499 CAD | Unlimited pages + tailored features |
+ 
+---
+ 
+## WEB SERVICES (Starting Prices)
+ 
+- Custom Plugin Development — from $960
+- Custom Theme Development — from $980
+- Speed & Security Optimization — from $420
+- Website Design & Development — from $2,500
+- E-commerce Site Design/Development — from $3,200
+- Landing Page (single high-converting page) — from $499
+- Website Audit & Report — from $250
+- Website Migration — from $350
+- Staging Environment Setup — $150
+- Custom 404 Page — $120
+- Membership / Gated Content Site — from $800
+- Directory Website — from $1,500
+- Event Website — from $799
+- Restaurant Website — from $1,200
+- Real Estate Website — from $1,500
+- Church / Nonprofit Website — from $799
+- Custom Calculator / Interactive Tool — from $500
+- Progressive Web App (PWA) — from $600
+- Accessibility Audit (WCAG 2.1) — from $350
+- Dark Mode Implementation — from $200
+- Favicon Design — $75
+- Coming Soon / Pre-Launch Page — from $150
+ 
+---
+ 
+## ADD-ON SERVICES
+ 
+- Logo Design — $200
+- Monthly Website Maintenance — $99/month
+- Advanced SEO Audit & Optimization — $350
+- Website Copywriting — $120/page
+- Speed Optimization — $180
+- Google Ads Campaign Setup — from $450
+- Email Marketing Setup (Mailchimp/Klaviyo) — from $300
+- Booking/Appointment Integration — from $200
+- Live Chat Widget Integration — from $150
+- Privacy Policy & Cookie Consent (GDPR/PIPEDA) — $180
+- Social Media Profile Setup (3 platforms) — $199
+- Professional Email Setup (Google Workspace / M365) — from $120
+- Schema Markup / Structured Data — from $200
+- XML Sitemap & Robots.txt — $120 standalone
+- 1-Hour CMS Training Session — $150
+- Annual Website Review — $299
+- Broken Link Audit & 301 Redirects — from $150
+- Multilingual Site Setup (e.g. English/French) — from $600
+- Graphic Design (banners, social assets) — from $150
+- Yelp Listing Setup — included in Pro/Elite packages
+- SSL Certificate Setup (standalone) — $120
+- Database Optimization — from $150
+- CRM Integration (HubSpot, Salesforce, Zoho) — from $400
+- Heatmap & Session Recording Setup (Hotjar/Clarity) — $150
+- A/B Testing Setup — from $250
+- Push Notification Setup — $180
+- API Integration — from $500
+- Custom Reporting Dashboard — from $400
+- Website Speed Audit (standalone) — $180
+- Hosting Setup & Configuration — $120
+- Domain Purchase Assistance — $75
+- Email Migration — from $200
+- QR Code Setup — $75
+- SMS Marketing Setup — from $200
+- Podcast Website & RSS Feed — from $500
+- Affiliate / Referral Program Setup — from $400
+- Online Course / LMS Setup — from $800
+- Client Portal — from $600
+- Thank You / Confirmation Pages — from $150
+- Exit Intent Popup — $150
+- Testimonial & Review Widget — $120
+- Virtual Showroom / Demo Page — from $500
+- Malware Removal & Site Cleanup — from $250
+- Security Audit — from $200
+- Shopify Store Setup — from $1,500
+- Abandoned Cart Recovery — $200
+- Upsell / Cross-Sell Configuration — $200
+- Subscription / Recurring Billing — from $350
+- Digital Product Delivery — from $300
+- Coupon & Discount Code Config — $150
+- Multi-Currency Setup — $200
+- Tax & Shipping Configuration — $150
+- Business Card Design — $150
+- Letterhead & Stationery — $150
+- Brochure / Flyer Design — from $200
+- Pitch Deck / Presentation Design — from $300
+- Infographic Design — from $200
+- Custom Icon Set (10 icons) — from $250
+- Brand Style Guide — from $500
+- Print-Ready File Preparation — $100
+ 
+---
+ 
+## WORDPRESS PRICING BREAKDOWN
+ 
+- Basic WordPress Setup — $300–$600 (theme install, core pages, SEO basics)
+- Custom Design & Branding — $600–$1,200+ (tailored layout, typography, mobile)
+- E-commerce Integration — $800–$1,500+ (WooCommerce, products, payment gateways)
+- Content Creation — $150–$500 (pages/blog/product copy)
+- SEO Optimization — included or +$200–$500 for advanced
+- Maintenance & Updates — $75–$150/month
+ 
+### WordPress Packages
+- **Starter Site** — $500–$800 (3–5 pages, basic setup, SEO essentials)
+- **Business Pro** — $1,200–$2,000 (custom design, content support, SEO, image optimization, contact forms)
+- **E-Commerce** — $1,500–$3,000+ (full store, products, payment, shipping)
+ 
+---
+ 
+## ONGOING / RETAINER SERVICES
+ 
+### Website Care Plans
+- **Basic** — $75/month: plugin & theme updates, security monitoring, offsite backups, uptime monitoring
+- **Standard** — $150/month: everything in Basic + up to 1hr content changes/month, monthly performance report, priority support
+- **Premium** — $299/month: everything in Standard + SEO monitoring, Google Business Profile management, listings accuracy monitoring, same-day support
+ 
+### Other Retainers
+- Hourly Consulting — $120/hour
+- Monthly SEO Retainer — from $299/month
+- Local SEO Package — from $199/month
+- National SEO Package — from $499/month
+- Google Ads Monthly Management — from $299/month (ad spend paid directly to Google)
+- Facebook/Instagram Ads Monthly Management — from $299/month
+- Social Media Management (3 platforms) — from $399/month
+- Monthly Email Campaign Management — from $199/month
+- Monthly Analytics Review & Reporting — $99/month
+- Monthly Blog Writing (2 SEO posts/month) — from $299/month
+- Priority Support Retainer — $199/month
+- Google Business Profile Post Management — $99/month
+- Link Building / Backlink Outreach — from $399/month
+ 
+---
+ 
+## BUSINESS VISIBILITY PACKAGES
+ 
+These get your business listed on the major local search platforms.
+ 
+**🌿 Starter** — $99 one-time
+- Google Business Profile setup
+- Bing Places for Business setup
+- Apple Business Connect setup
+- Business info, hours, photos, categories, verification assistance
+ 
+**🚀 Pro** — $199 setup + $29/month
+- Everything in Starter, plus:
+- Yelp listing setup
+- Facebook Business Page creation
+- Monthly listing updates (hours, photos, offers)
+- Basic review monitoring, priority support
+ 
+**👑 Elite** — $399 setup + $59/month
+- Everything in Pro, plus:
+- Listings on 5+ directories (Yelp, YellowPages, Foursquare, etc.)
+- SEO optimization for all listings
+- Branded email setup (e.g. info@yourbusiness.com)
+- Google Search Console & Analytics setup
+- Monthly performance reports
+ 
+---
+ 
+## SEO SERVICES
+ 
+- On-page SEO is standard in every build (keyword research, title tags, meta descriptions, heading structure, alt text, internal linking)
+- Google Analytics 4 + Search Console integration standard
+- Image SEO: filename renaming, alt text, WebP conversion, geotagging for local businesses
+- Local SEO: NAP consistency, Google Business Profile optimization, local citation building
+- SEO timelines: technical improvements in weeks; competitive keyword rankings typically 3–6 months
+ 
+---
+ 
+## ECOMMERCE
+ 
+Platforms: **WooCommerce** (WordPress — more flexibility, full control, lower ongoing costs) or **Shopify** (fully hosted, simpler for pure retail).
+ 
+Daniel handles: product setup, categories, payment gateway integration, shipping/tax configuration, and training.
+ 
+---
+ 
+## PROCESS
+ 
+1. **Discovery** — goals, content, examples
+2. **Design** — layout, mockups
+3. **Build** — development
+4. **Review** — 2–3 revision rounds
+5. **Launch**
+ 
+- Deposit required to begin; balance due before launch
+- Domain and hosting always in client's name
+- Full ownership transferred on final payment
+- Timeline: typically 1–4 weeks depending on scope and content readiness
+- Works remotely with clients across Canada and internationally
+ 
+---
+ 
+## PLATFORMS COMPARED
+ 
+- **Custom HTML** — fastest, most secure, minimal maintenance. Best for portfolios, landing pages, local service businesses. PageSpeed typically 90–100.
+- **WordPress** — flexible, easy to self-manage, great for blogs/eCommerce/service sites. Powers 40%+ of the web.
+- **Shopify** — hosted retail-first store, lower ongoing maintenance, monthly platform fee.
+- **WooCommerce** — WordPress + store. Full control, lower long-term costs, more setup complexity.
+- **Template builders (Wix/Squarespace)** — fast but limited, recurring fees, template appearance, weaker SEO, no real ownership.
+ 
+---
+ 
+## TECH STACK
+ 
+HTML, CSS, JavaScript, PHP, MySQL — the core web stack. WordPress ecosystem for WP projects. Clean hand-crafted code, no unnecessary frameworks for HTML builds.
+ 
+---
+ 
+## BUDGET GUIDE (Rough Tiers)
+ 
+- **$99–$500** — DIY builders, basic one-pagers
+- **$500–$2,000** — Starter business sites
+- **$2,000–$5,000** — Professional presence (custom UX, CMS, eCommerce, SEO)
+- **$5,000–$10,000** — Advanced functionality & branding
+- **$10,000+** — Enterprise/scalable platforms
+ 
+---
+ 
+## CONTACT
+ 
+- **Email:** danieldavidwilds@gmail.com ← fastest
+- **Phone:** (604) 901-1692
+- **Hours:** Monday–Friday, 8 AM–6 PM Pacific Time
+- **Quote:** Free, no-obligation. Share your business type, goals, platform preference, pages, and features.
+- **Portfolio:** w3bmstr.wordpress.com/portfolio
+- **FAQs:** w3bmstr.wordpress.com/faqs
+- **Full site:** w3bmstr.wordpress.com
+ 
+---
+ 
+## TONE GUIDELINES
+ 
+- Be friendly, helpful, and honest — never pushy
+- Use specific numbers and package names when relevant
+- If asked something outside your knowledge, acknowledge it and suggest emailing Daniel
+- Keep answers concise but complete — bullet points help
+- Always be ready to suggest the next step (email/call Daniel)`;
+ 
+// ─────────────────────────────────────────────────────────────────────────────
+// QUICK-START CHIPS
+// ─────────────────────────────────────────────────────────────────────────────
+const CHIPS = [
+  { l: '💸 Website pricing',        q: 'What are the website packages and pricing?' },
+  { l: '⚡ HTML vs WordPress',      q: 'What are the differences between HTML and WordPress sites?' },
+  { l: '🛒 eCommerce options',      q: 'What eCommerce options do you offer and how much do they cost?' },
+  { l: '📍 Business listings',      q: 'Tell me about the business visibility packages' },
+  { l: '🔍 SEO services',           q: 'What SEO services do you offer?' },
+  { l: '🤖 Meet the robot team',    q: 'Tell me about the robot sales personas Aurora, Maya, and Riley' },
+  { l: '🛡️ Security & maintenance', q: 'What maintenance and security options are available?' },
+  { l: '📞 Contact Daniel',         q: 'How do I get in touch with Daniel?' },
+];
+ 
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let history = [];   // {role, content}[]
+let busy    = false;
+ 
+// ─────────────────────────────────────────────────────────────────────────────
+// DOM HELPERS
+// ─────────────────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+ 
+function scrollBottom() {
+  const el = $('msgs');
+  el.scrollTop = el.scrollHeight;
+}
+ 
+/** Lightweight markdown → HTML (bold, italic, ul, ol, hr, headings) */
+function renderMarkdown(text) {
+  let h = text
+    // escape HTML first
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    // headings
+    .replace(/^### (.+)$/gm, '<div class="tag">▸ $1</div>')
+    .replace(/^## (.+)$/gm, '<strong style="font-size:15px;display:block;margin:8px 0 4px;letter-spacing:.5px">$1</strong>')
+    .replace(/^# (.+)$/gm,  '<strong style="font-size:16px;display:block;margin:10px 0 5px;">$1</strong>')
+    // horizontal rule
+    .replace(/^---$/gm, '<hr>')
+    // bold + italic
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,   '<em>$1</em>')
+    // inline code
+    .replace(/`([^`]+)`/g, '<code style="background:rgba(0,255,231,0.1);padding:1px 5px;border-radius:3px;font-family:var(--mono);font-size:12px">$1</code>');
+ 
+  // simple table
+  const lines = h.split('\n');
+  const out = [];
+  let inTable = false, inList = false, listTag = '';
+ 
+  for (let i = 0; i < lines.length; i++) {
+    const ln = lines[i];
+ 
+    // table
+    if (ln.startsWith('|')) {
+      if (!inTable) { out.push('<table>'); inTable = true; }
+      const cells = ln.split('|').filter((_, idx, arr) => idx > 0 && idx < arr.length - 1);
+      if (cells.every(c => /^[-: ]+$/.test(c.trim()))) continue; // separator row
+      const isHeader = (i === 0 || !lines[i-1].startsWith('|')) && lines[i+1] && /^\|[-:| ]+\|$/.test(lines[i+1]);
+      const tag = isHeader ? 'th' : 'td';
+      out.push('<tr>' + cells.map(c => `<${tag}>${c.trim()}</${tag}>`).join('') + '</tr>');
+      continue;
+    }
+    if (inTable) { out.push('</table>'); inTable = false; }
+ 
+    // unordered list
+    if (/^[-•]\s/.test(ln)) {
+      if (!inList || listTag !== 'ul') {
+        if (inList) out.push(`</${listTag}>`);
+        out.push('<ul>'); inList = true; listTag = 'ul';
+      }
+      out.push(`<li>${ln.replace(/^[-•]\s/, '')}</li>`);
+      continue;
+    }
+    // ordered list
+    if (/^\d+\.\s/.test(ln)) {
+      if (!inList || listTag !== 'ol') {
+        if (inList) out.push(`</${listTag}>`);
+        out.push('<ol>'); inList = true; listTag = 'ol';
+      }
+      out.push(`<li>${ln.replace(/^\d+\.\s/, '')}</li>`);
+      continue;
+    }
+    if (inList) { out.push(`</${listTag}>`); inList = false; listTag = ''; }
+ 
+    if (ln.trim() === '') { out.push('<br>'); continue; }
+    out.push(ln);
+  }
+  if (inTable) out.push('</table>');
+  if (inList)  out.push(`</${listTag}>`);
+ 
+  return out.join('\n');
+}
+ 
+function addBotMsg(html, isStreaming = false) {
+  const msgs = $('msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg b';
+  const ico = document.createElement('div');
+  ico.className = 'mi'; ico.textContent = '🤖';
+  const bbl = document.createElement('div');
+  bbl.className = 'bbl';
+  bbl.innerHTML = html;
+  wrap.appendChild(ico);
+  wrap.appendChild(bbl);
+  msgs.appendChild(wrap);
+  scrollBottom();
+  return bbl;
+}
+ 
+function addUserMsg(text) {
+  const msgs = $('msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg u';
+  const ico = document.createElement('div');
+  ico.className = 'mi'; ico.textContent = '👤';
+  const bbl = document.createElement('div');
+  bbl.className = 'bbl';
+  bbl.textContent = text;
+  wrap.appendChild(ico);
+  wrap.appendChild(bbl);
+  msgs.appendChild(wrap);
+  scrollBottom();
+}
+ 
+function addTypingIndicator() {
+  const msgs = $('msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg b';
+  wrap.id = 'typing';
+  const ico = document.createElement('div');
+  ico.className = 'mi'; ico.textContent = '🤖';
+  const bbl = document.createElement('div');
+  bbl.className = 'bbl';
+  bbl.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  wrap.appendChild(ico);
+  wrap.appendChild(bbl);
+  msgs.appendChild(wrap);
+  scrollBottom();
+  return wrap;
+}
+ 
+function removeTypingIndicator() {
+  const el = $('typing');
+  if (el) el.remove();
+}
+ 
+function addChips(items) {
+  const msgs = $('msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'chips';
+  items.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = c.l;
+    btn.addEventListener('click', () => { respond(c.q); wrap.remove(); });
+    wrap.appendChild(btn);
+  });
+  msgs.appendChild(wrap);
+  scrollBottom();
+}
+ 
+function setUI(isBusy) {
+  busy = isBusy;
+  $('tin').disabled = isBusy;
+  $('sbtn').disabled = isBusy;
+  $('sbtn').textContent = isBusy ? 'THINKING…' : 'SEND ▶';
+}
+ 
+// ─────────────────────────────────────────────────────────────────────────────
+// API CALL
+// ─────────────────────────────────────────────────────────────────────────────
+async function callClaude(userMessage) {
+  history.push({ role: 'user', content: userMessage });
+ 
+  const body = {
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1000,
+    system: SYSTEM_PROMPT,
+    messages: history,
+  };
+ 
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+ 
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `HTTP ${res.status}`);
+  }
+ 
+  const data = await res.json();
+  const reply = data.content?.find(b => b.type === 'text')?.text || '';
+  history.push({ role: 'assistant', content: reply });
+  return reply;
+}
+ 
+// ─────────────────────────────────────────────────────────────────────────────
+// RESPOND
+// ─────────────────────────────────────────────────────────────────────────────
+async function respond(query) {
+  if (busy || !query.trim()) return;
+  addUserMsg(query);
+  setUI(true);
+  const typing = addTypingIndicator();
+ 
+  try {
+    const reply = await callClaude(query);
+    removeTypingIndicator();
+    addBotMsg(renderMarkdown(reply));
+  } catch (e) {
+    removeTypingIndicator();
+    addBotMsg(`<em style="color:rgba(255,100,100,0.8)">Sorry, something went wrong: ${e.message}.<br>Please email <strong>danieldavidwilds@gmail.com</strong> or call <strong>(604) 901-1692</strong> directly.</em>`);
+    // remove last user message from history so user can retry
+    history.pop();
+  } finally {
+    setUI(false);
+    $('tin').focus();
+  }
+}
+ 
+// ─────────────────────────────────────────────────────────────────────────────
+// SEND
+// ─────────────────────────────────────────────────────────────────────────────
+function send() {
+  const tin = $('tin');
+  const q = tin.value.trim();
+  if (!q || busy) return;
+  tin.value = '';
+  respond(q);
+}
+ 
+$('tin').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+ 
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+(function init() {
+  const greeting = `👋 Hi! I'm the **AI-powered** Robot Sales Assistant for **Daniel Wilds Web Design**.
+ 
+I can answer detailed questions about **pricing**, **packages**, **timelines**, **HTML vs WordPress**, **eCommerce**, **SEO**, **business listings**, **branding**, and more — just ask anything.
+ 
+You can also reach Daniel directly at **danieldavidwilds@gmail.com** or **(604) 901-1692**.`;
+ 
+  addBotMsg(renderMarkdown(greeting));
+  history.push({ role: 'assistant', content: greeting });
+  addChips(CHIPS);
+})();
+</script>
+</body>
+</html>

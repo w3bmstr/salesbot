@@ -97,8 +97,161 @@
         </div>
       </main>
     </div>
+    <script src="glossary.js"></script>
     <script>
     const STATE={lastHit:null};
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, ch => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#39;'
+      }[ch]));
+    }
+
+    function normalizeGlossaryKeyStrict(s){
+      // Case-insensitive, whitespace-collapsed, but preserves punctuation.
+      // This avoids collisions like "C" vs "C++" that a punctuation-stripping key would cause.
+      return String(s)
+        .replace(/[“”]/g,'"')
+        .replace(/[’]/g,"'")
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g,' ');
+    }
+
+    function normalizeGlossaryKeyLoose(s){
+      // Punctuation-tolerant variant used only when the match is unambiguous.
+      return normalizeGlossaryKeyStrict(s)
+        .replace(/[^a-z0-9]+/g,' ')
+        .trim()
+        .replace(/\s+/g,' ');
+    }
+
+    function buildGlossary(entries){
+      const strict=new Map();
+      const loose=new Map(); // looseKey -> entry | null (null means ambiguous)
+      const arr=Array.isArray(entries)?entries:[];
+
+      function addVariant(keyString, entry){
+        const strictKey=normalizeGlossaryKeyStrict(keyString);
+        if(strictKey) strict.set(strictKey, entry);
+
+        const looseKey=normalizeGlossaryKeyLoose(keyString);
+        if(!looseKey) return;
+        if(!loose.has(looseKey)){
+          loose.set(looseKey, entry);
+        } else {
+          const existing=loose.get(looseKey);
+          if(existing !== entry) loose.set(looseKey, null);
+        }
+      }
+
+      for(const raw of arr){
+        if(!raw) continue;
+        const term=String(raw.term||'').trim();
+        const definition=String(raw.definition||'').trim();
+        if(!term || !definition) continue;
+        const e={term, definition};
+
+        addVariant(term, e);
+        if(Array.isArray(raw.aliases)){
+          for(const a of raw.aliases){
+            const alias=String(a||'').trim();
+            if(alias) addVariant(alias, e);
+          }
+        }
+      }
+      return { strict, loose };
+    }
+
+    const GLOSSARY=buildGlossary(window.GLOSSARY_ENTRIES);
+
+    function cleanLookupTerm(s){
+      let t=String(s||'').trim();
+      t=t.replace(/^["'`]+|["'`]+$/g,'').trim();
+      t=t.replace(/^(a|an|the)\s+/i,'');
+      return t.trim();
+    }
+
+    function extractGlossaryTerm(q){
+      const raw=String(q||'').trim();
+      if(!raw) return null;
+      const q1=raw.replace(/[?!.]+\s*$/,'').trim();
+
+      const patterns=[
+        /^define\s+(.+)$/i,
+        /^definition\s+of\s+(.+)$/i,
+        /^meaning\s+of\s+(.+)$/i,
+        /^what\s+is\s+(.+)$/i,
+        /^what\s+are\s+(.+)$/i,
+        /^what\s+is\s+an\s+(.+)$/i,
+        /^what\s+is\s+a\s+(.+)$/i,
+        /^what\s+is\s+the\s+(.+)$/i,
+        /^what's\s+(.+)$/i,
+        /^whats\s+(.+)$/i,
+        /^explain\s+(.+)$/i,
+        /^tell\s+me\s+about\s+(.+)$/i,
+        /^what\s+does\s+(.+?)\s+mean$/i,
+      ];
+      for(const re of patterns){
+        const m=q1.match(re);
+        if(m && m[1]) return m[1].trim();
+      }
+      return null;
+    }
+
+    function getGlossaryAnswer(q){
+      if(!GLOSSARY.strict.size) return null;
+      const raw=String(q||'').trim();
+      if(!raw) return null;
+
+      // 1) Direct whole-query match (e.g., "content", "CI/CD", ".NET")
+      const directStrictHit=GLOSSARY.strict.get(normalizeGlossaryKeyStrict(raw));
+      if(directStrictHit){
+        return `<strong>${escapeHtml(directStrictHit.term)}</strong>: ${escapeHtml(directStrictHit.definition)}`;
+      }
+      const directLooseKey=normalizeGlossaryKeyLoose(raw);
+      const directLooseHit=directLooseKey ? GLOSSARY.loose.get(directLooseKey) : null;
+      if(directLooseHit){
+        return `<strong>${escapeHtml(directLooseHit.term)}</strong>: ${escapeHtml(directLooseHit.definition)}`;
+      }
+
+      // 2) Explicit definition/meaning intent (e.g., "what is content")
+      const candidate=extractGlossaryTerm(raw);
+      if(candidate){
+        const cleaned=cleanLookupTerm(candidate);
+        const strictHit=GLOSSARY.strict.get(normalizeGlossaryKeyStrict(cleaned));
+        if(strictHit){
+          return `<strong>${escapeHtml(strictHit.term)}</strong>: ${escapeHtml(strictHit.definition)}`;
+        }
+        const looseKey=normalizeGlossaryKeyLoose(cleaned);
+        const looseHit=looseKey ? GLOSSARY.loose.get(looseKey) : null;
+        if(looseHit){
+          return `<strong>${escapeHtml(looseHit.term)}</strong>: ${escapeHtml(looseHit.definition)}`;
+        }
+      }
+
+      // 3) Embedded-term fallback: pick the longest *unambiguous* loose-key term present in the query
+      // Example: "Can you explain content strategy?" => "content strategy" (if present).
+      const tokens=normalizeGlossaryKeyLoose(raw).split(' ').filter(Boolean);
+      if(tokens.length){
+        const maxWindow=Math.min(tokens.length, 12);
+        for(let window=maxWindow; window>=1; window--){
+          for(let i=0; i+window<=tokens.length; i++){
+            const phrase=tokens.slice(i, i+window).join(' ');
+            const embeddedHit=GLOSSARY.loose.get(phrase);
+            if(embeddedHit){
+              return `<strong>${escapeHtml(embeddedHit.term)}</strong>: ${escapeHtml(embeddedHit.definition)}`;
+            }
+          }
+        }
+      }
+
+      return null;
+    }
 
     const STOPWORDS=new Set([
       'a','an','and','are','as','at','be','but','by','can','could','did','do','does','for','from','had','has','have','how',
@@ -992,6 +1145,16 @@ const CHIPS = [
     function respond(q){
       addMsg(q,true);
       setUIBusy(true);
+
+      const glossaryHtml=getGlossaryAnswer(q);
+      if(glossaryHtml){
+        setTimeout(()=>{
+          addMsg(glossaryHtml,false,'DEFINITION');
+          setUIBusy(false);
+        },260);
+        return;
+      }
+
       const {results}=searchKB(q, 6);
       const best=pickBestResult(results);
       setTimeout(()=>{
